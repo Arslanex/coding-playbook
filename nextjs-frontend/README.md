@@ -1,11 +1,69 @@
 # Next.js frontend
 
 WHEN: any TypeScript/React/Next.js UI in this stack (`frontend/` app tree).
-LOAD: [the playbook root](../README.md) first (not carved in stone — adapt to this project and write it back here). Then this map, then the numbered file that matches the task, plus whatever that file's own `LOAD:` line names. Visual work: [01-design.md](01-design.md) **before** other files.
+LOAD: [playbook root](../README.md) first. Then [agents/02-turn.md](../agents/02-turn.md). Then this map. Then **one** numbered file below that matches the task (+ that file's `LOAD:` line only). On session start also LOAD [agents/01-boundary.md](../agents/01-boundary.md). On error LOAD [agents/04-errors.md](../agents/04-errors.md). Visual work: [01-design.md](01-design.md) **before** other frontend files.
 
 MUST NOT: load all sixteen files for one change.
 MUST NOT: load Extra unless a line under Extra matches what this product **already** has.
-MUST NOT: copy [python-fastapi-backend](../python-fastapi-backend/README.md) folders into `frontend/` (`http/` · `modules/` · `infra/` are the API, not the UI).
+MUST NOT: copy [python-fastapi-backend](../python-fastapi-backend/README.md) folders into `frontend/`.
+MUST NOT: load human guides at repo root unless `@`-referenced.
+
+---
+
+## Agent: which numbered file WHEN
+
+WHEN: any screen, colour, spacing, empty/loading/error state, or generated UI.
+LOAD: [01-design.md](01-design.md) **first**.
+
+WHEN: split file, types, naming, no `utils/`.
+LOAD: [02-coding-principles.md](02-coding-principles.md).
+
+WHEN: new file and unsure `app/` vs `features/` vs `ui/` vs `lib/`.
+LOAD: [03-file-structure.md](03-file-structure.md).
+
+WHEN: env var, `NEXT_PUBLIC_*`, server vs browser env.
+LOAD: [04-config.md](04-config.md).
+
+WHEN: `"use client"`, hooks, event handler, server vs client.
+LOAD: [05-server-client.md](05-server-client.md).
+
+WHEN: URL, layout loading/error, metadata, `noindex`.
+LOAD: [06-routing.md](06-routing.md).
+
+WHEN: server fetch, RSC data, list/detail read — not client GET in `useEffect`.
+LOAD: [07-data.md](07-data.md).
+
+WHEN: form, mutation, Server Action, save/cancel/delete.
+LOAD: [08-forms.md](08-forms.md).
+
+WHEN: API client, `/v1`, cookies, `error_code`, base URL.
+LOAD: [09-api-client.md](09-api-client.md).
+
+WHEN: new feature under `features/<noun>/`.
+LOAD: [10-features.md](10-features.md).
+
+WHEN: Button, field, modal, skeleton, token, primitive.
+LOAD: [11-ui.md](11-ui.md) (+ [01-design.md](01-design.md)).
+
+WHEN: sign-in, session cookie, protected route.
+LOAD: [12-auth.md](12-auth.md).
+
+WHEN: URL params, global store, "need state".
+LOAD: [13-state.md](13-state.md).
+
+WHEN: tests, four states, mirror path.
+LOAD: [14-testing.md](14-testing.md).
+
+WHEN: PR pass, XSS, CSRF, secrets, a11y before merge.
+LOAD: [15-security.md](15-security.md).
+
+WHEN: slow page, bundle, images, RSC waterfall.
+LOAD: [16-performance.md](16-performance.md).
+
+WHEN: user pasted build/runtime/hydration/API error.
+LOAD: [agents/04-errors.md](../agents/04-errors.md) first; then the numbered file named in the matched block.
+
+MUST NOT: open `RELATED:` unless the task is also that topic.
 
 ## Backbone
 

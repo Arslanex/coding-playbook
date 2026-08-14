@@ -1,9 +1,57 @@
 # Coding Playbook
 
+**Human readers:** this repo is a playbook for your team and your coding agents — not runnable app code. Start with **[USER-GUIDE.md](USER-GUIDE.md)** (EN + TR). Prompts: **[HOW-TO-PROMPT.md](HOW-TO-PROMPT.md)**. Vibe coding risks: **[VIBE-CODING-PITFALLS.md](VIBE-CODING-PITFALLS.md)**. Error checklist (50): **[VIBE-CODING-ERRORS.md](VIBE-CODING-ERRORS.md)** (EN + TR).
+
+**İnsan okuyucular:** **[USER-GUIDE.md](USER-GUIDE.md)** · **[HOW-TO-PROMPT.md](HOW-TO-PROMPT.md)** · **[VIBE-CODING-PITFALLS.md](VIBE-CODING-PITFALLS.md)** · **[VIBE-CODING-ERRORS.md](VIBE-CODING-ERRORS.md)** (50 hata, EN + TR).
+
+---
+
+## Agent instructions
+
+Everything below is written for **AI coding agents** (`WHEN` / `LOAD` / `MUST`). Humans can skip to [USER-GUIDE.md](USER-GUIDE.md).
+
 WHEN: creating or editing application code, **or** changing a playbook file because this project decided differently.
-LOAD: this file first. Then the **stack** README that matches the files you are touching. MUST NOT: load every stack.
+LOAD: this file first. Then follow **Agent LOAD map** below. MUST NOT: load every stack. MUST NOT: load human prose guides (`USER-GUIDE.md`, `HOW-TO-PROMPT.md`, `VIBE-CODING-*.md`) unless the user `@`-references them.
 
 This folder is playbook, not application source. MUST NOT: copy it into `src/`.
+
+---
+
+## Agent LOAD map (which file, which situation)
+
+WHEN: **first code edit in a session** (or stack unknown).
+LOAD: [agents/01-boundary.md](agents/01-boundary.md).
+
+WHEN: **every user message** that changes code, reviews a diff, or fixes a bug.
+LOAD: [agents/02-turn.md](agents/02-turn.md).
+
+WHEN: prompt is **vague**, **multi-feature**, or you are about to **create many files / load many docs**.
+LOAD: [agents/03-anti-patterns.md](agents/03-anti-patterns.md).
+
+WHEN: user pasted **error text**, stack trace, HTTP status failure, or CI log.
+LOAD: [agents/04-errors.md](agents/04-errors.md) → then the stack numbered file named in the matched block.
+
+WHEN: editing **Python** under `backend/` (FastAPI, workers).
+LOAD: [python-fastapi-backend/README.md](python-fastapi-backend/README.md) → **one** numbered `01`–`16` file for the task (+ its `LOAD:` siblings only).
+
+WHEN: editing **TypeScript/React/Next** under `frontend/`.
+LOAD: [nextjs-frontend/README.md](nextjs-frontend/README.md) → **one** numbered `01`–`16` file for the task (+ its `LOAD:` siblings only). Visual work: frontend `01-design` before other frontend files.
+
+WHEN: product **already ships** an Extra shape (tenant, SSO, in-product agents, search, …).
+LOAD: matching `extra/NN-….md` for that stack **in addition to** the numbered file — not instead of `01`–`16`.
+
+WHEN: playbook rule must change to match **this** product (see Not carved in stone).
+WHERE: the matching numbered or Extra playbook file.
+HOW: edit playbook with one-line reason in `SCOPE`; then implement in application code.
+
+WHEN: user asks for human onboarding or prompt templates.
+HOW: point to [USER-GUIDE.md](USER-GUIDE.md) and [HOW-TO-PROMPT.md](HOW-TO-PROMPT.md) — MUST NOT load them yourself unless `@`-referenced.
+
+Full agent routing index: [agents/README.md](agents/README.md).
+
+MUST NOT: load all of `agents/` for one edit.
+MUST NOT: load all sixteen numbered files for one edit.
+MUST NOT: load Extra because it might be useful later.
 
 ---
 
@@ -55,3 +103,17 @@ Only if that UI **already** has the shape. Map: [nextjs-frontend/README.md](next
 6. Search UI — [nextjs-frontend/extra/06-search.md](nextjs-frontend/extra/06-search.md)
 7. Uploads — [nextjs-frontend/extra/07-uploads.md](nextjs-frontend/extra/07-uploads.md)
 8. Agent run UI — [nextjs-frontend/extra/08-agents.md](nextjs-frontend/extra/08-agents.md)
+
+---
+
+## Agent operations files (coding agents only)
+
+WHEN: you are the **IDE coding agent** — not an in-product `AgentRun` worker ([backend extra 03](python-fastapi-backend/extra/03-agent-teams.md)).
+LOAD: [agents/README.md](agents/README.md) for the full WHEN → file map.
+
+WHEN: session start → LOAD [agents/01-boundary.md](agents/01-boundary.md).
+WHEN: every code turn → LOAD [agents/02-turn.md](agents/02-turn.md).
+WHEN: broad or risky prompt → LOAD [agents/03-anti-patterns.md](agents/03-anti-patterns.md).
+WHEN: user pasted an error → LOAD [agents/04-errors.md](agents/04-errors.md).
+
+Human mirrors (users only): [USER-GUIDE.md](USER-GUIDE.md) · [HOW-TO-PROMPT.md](HOW-TO-PROMPT.md) · [VIBE-CODING-PITFALLS.md](VIBE-CODING-PITFALLS.md) · [VIBE-CODING-ERRORS.md](VIBE-CODING-ERRORS.md).
