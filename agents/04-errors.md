@@ -3,7 +3,7 @@
 WHEN: the user pasted a build log, runtime stack trace, HTTP failure, auth bug, or deploy error — or said "it broke" **with** a specific message.
 LOAD: this file and [02-turn.md](02-turn.md). Then the stack file named in the matched block's `LOAD:` line (+ that file's `LOAD:` siblings only).
 RELATED: [03-anti-patterns.md](03-anti-patterns.md) if the fix tempts a large rewrite.
-SCOPE: match error text → WHERE to edit → HOW to fix. Human checklist: [VIBE-CODING-ERRORS.md](../VIBE-CODING-ERRORS.md).
+SCOPE: match error text → WHERE to edit → HOW to fix. Human checklist: [for-humans 05-errors](../for-humans/en/05-errors.md) — do not load it; point the user there.
 
 MUST: read the **verbatim** error string first.
 MUST: use the **first** block below whose WHEN line matches.
@@ -26,8 +26,10 @@ MUST NOT: bundle unrelated fixes in one turn unless user listed them all.
 
 WHEN: log contains `Module not found` or `Cannot find module` for a **package name** (not a relative `./` or `../` path).
 WHERE: `package.json`, `pyproject.toml`, lockfile.
-HOW: declare dependency; pin version; install.
-LOAD: none unless install layout is unclear.
+HOW: **first** confirm the name is real and is the one meant — the error is quoting the name *you wrote*, so a typo or an invented name produces exactly this log. Then install it with the package manager so the **current** version and the lockfile are written together — MUST NOT: hand-type a remembered version ([03-anti-patterns.md](03-anti-patterns.md)).
+LOAD: [03-anti-patterns.md](03-anti-patterns.md) Dependencies before the manifest edit. Then [frontend 03](../nextjs-frontend/03-file-structure.md) / [backend 02](../python-fastapi-backend/02-file-structure.md) if install layout is unclear.
+MUST NOT: install the name from the traceback without checking it exists — a name that does not exist may have been registered by someone who expects this mistake.
+MUST NOT: install a near-match ("close enough") — ask instead.
 MUST NOT: shim the import locally instead of declaring the dependency.
 
 ### A02 · Wrong relative import path
@@ -346,9 +348,11 @@ LOAD: [nextjs 15-security](../nextjs-frontend/15-security.md).
 ### E44 · CI build fails, local passes
 
 WHEN: pipeline fails while local build succeeds.
-WHERE: CI Node/Python version, env vars, import paths.
-HOW: pin runtime versions; set all env in CI; fix filename case for Linux.
+WHERE: CI Node/Python version, env vars, import paths, install step.
+HOW: pin runtime versions; set all env in CI; fix filename case for Linux; install from the committed lockfile so CI and local resolve the same tree.
 LOAD: [backend 03-config](../python-fastapi-backend/03-config.md), [nextjs 04-config](../nextjs-frontend/04-config.md).
+MUST NOT: treat a failing **dependency audit** step as flaky CI to skip — that step failing is a finding, not a build problem ([frontend 03](../nextjs-frontend/03-file-structure.md), [backend 02](../python-fastapi-backend/02-file-structure.md)).
+MUST NOT: a `NEXT_PUBLIC_*` fix that assumes the host env applies at runtime — those are baked at build ([nextjs 04-config](../nextjs-frontend/04-config.md)).
 
 ### E45 · Serverless / HTTP timeout
 

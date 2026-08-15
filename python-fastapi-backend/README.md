@@ -1,13 +1,15 @@
 # Python FastAPI backend
 
 WHEN: any Python edit in this stack (FastAPI HTTP process, workers, `src/` under the app `backend/` tree).
-LOAD: [playbook root](../README.md) first. Then [agents/02-turn.md](../agents/02-turn.md). Then this map. Then **one** numbered file below that matches the task (+ that file's `LOAD:` line only). On session start also LOAD [agents/01-boundary.md](../agents/01-boundary.md). On error LOAD [agents/04-errors.md](../agents/04-errors.md).
+LOAD: [AGENTS.md](../AGENTS.md) first. Then [agents/02-turn.md](../agents/02-turn.md). Then this map. Then **one** numbered file below that matches the task (+ that file's `LOAD:` line only). On session start also LOAD [agents/01-boundary.md](../agents/01-boundary.md). On error LOAD [agents/04-errors.md](../agents/04-errors.md).
 
 MUST NOT: load all sixteen files for one change.
 MUST NOT: load Extra unless a line under Extra matches what this product **already** has.
-MUST NOT: load human guides at repo root unless `@`-referenced.
+MUST NOT: load anything under `for-humans/` unless `@`-referenced.
 
 This playbook lives at `coding-playbook/python-fastapi-backend/`. The **application** tree it describes is still named `backend/` (02).
+
+TARGETS: FastAPI with **Pydantic v2** and **SQLAlchemy 2.0** style (`Mapped[...]`, `select()`), Alembic, Python 3.11+. WHEN: the product is on an older major, or one of these ships a new major — the rules that encode framework behaviour (`05`, `06`, `07`, `10`, `12`, `13`) are the ones to re-read and adapt in git ([AGENTS.md](../AGENTS.md), *Not carved in stone*). MUST NOT: apply a rule from this playbook that the project's installed major does not have.
 
 ---
 
@@ -18,6 +20,9 @@ LOAD: [01-coding-principles.md](01-coding-principles.md).
 
 WHEN: new file and unsure which folder.
 LOAD: [02-file-structure.md](02-file-structure.md).
+
+WHEN: adding a package, `pyproject.toml`, lockfile, Python/base-image version, an audit finding, or a framework upgrade.
+LOAD: [02-file-structure.md](02-file-structure.md) Dependencies + [agents/03-anti-patterns.md](../agents/03-anti-patterns.md) Dependencies **before** the manifest edit.
 
 WHEN: env var, limit, timeout, secret name, feature flag.
 LOAD: [03-config.md](03-config.md).

@@ -1,12 +1,16 @@
 # Next.js frontend
 
 WHEN: any TypeScript/React/Next.js UI in this stack (`frontend/` app tree).
-LOAD: [playbook root](../README.md) first. Then [agents/02-turn.md](../agents/02-turn.md). Then this map. Then **one** numbered file below that matches the task (+ that file's `LOAD:` line only). On session start also LOAD [agents/01-boundary.md](../agents/01-boundary.md). On error LOAD [agents/04-errors.md](../agents/04-errors.md). Visual work: [01-design.md](01-design.md) **before** other frontend files.
+LOAD: [AGENTS.md](../AGENTS.md) first. Then [agents/02-turn.md](../agents/02-turn.md). Then this map. Then **one** numbered file below that matches the task (+ that file's `LOAD:` line only). On session start also LOAD [agents/01-boundary.md](../agents/01-boundary.md). On error LOAD [agents/04-errors.md](../agents/04-errors.md). Visual work: [01-design.md](01-design.md) **before** other frontend files.
 
 MUST NOT: load all sixteen files for one change.
 MUST NOT: load Extra unless a line under Extra matches what this product **already** has.
 MUST NOT: copy [python-fastapi-backend](../python-fastapi-backend/README.md) folders into `frontend/`.
-MUST NOT: load human guides at repo root unless `@`-referenced.
+MUST NOT: load anything under `for-humans/` unless `@`-referenced.
+
+TARGETS: **Next.js App Router** (RSC default, Server Actions, `proxy.ts` — the file Next 16 renamed from `middleware.ts`), React 19, TypeScript `strict`. WHEN: the product is on an older major, or Next ships a new one — `05`, `06`, `07`, `08`, `12` are the rules that encode framework behaviour; re-read those and adapt in git ([AGENTS.md](../AGENTS.md), *Not carved in stone*). MUST NOT: apply a rule this project's installed major does not have (Pages Router, or a Next without Server Actions, is a different playbook).
+
+Rule strength (full definition: [AGENTS.md](../AGENTS.md)): `[critical]` = secret, another user's data, or an authz gate — state the exposure before writing the code. Unmarked `MUST` = this playbook's shape; follow by default, yield to the user and to what the product already ships. `SHOULD` = a default, deviate with a reason.
 
 ---
 
@@ -20,6 +24,9 @@ LOAD: [02-coding-principles.md](02-coding-principles.md).
 
 WHEN: new file and unsure `app/` vs `features/` vs `ui/` vs `lib/`.
 LOAD: [03-file-structure.md](03-file-structure.md).
+
+WHEN: adding a package, `package.json`, lockfile, Node version, an audit finding, or a framework upgrade.
+LOAD: [03-file-structure.md](03-file-structure.md) Dependencies + [agents/03-anti-patterns.md](../agents/03-anti-patterns.md) Dependencies **before** the manifest edit.
 
 WHEN: env var, `NEXT_PUBLIC_*`, server vs browser env.
 LOAD: [04-config.md](04-config.md).
@@ -74,7 +81,7 @@ ui/          primitives. no product sentence.
 lib/         env, fetch wrapper. not utils/.
 ```
 
-MUST: FastAPI owns writes and authz. MUST NOT: Next talking to Postgres. MUST NOT: JWT in `localStorage`.
+MUST [critical]: FastAPI owns writes and authz. MUST NOT [critical]: Next talking to Postgres. MUST NOT [critical]: JWT in `localStorage`.
 
 ## How to load
 

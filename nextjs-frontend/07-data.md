@@ -24,8 +24,8 @@ Parse with the feature Zod schema (09, 10). `unknown` in, typed out. MUST NOT: `
 
 `fetch` to FastAPI: set an explicit cache policy. Default for user-specific data: `cache: "no-store"` (or `cookies()` already opts you out). Public, rarely changing: `next: { revalidate: n }` from `lib/env.ts` (04).
 
-MUST NOT: cache a user's orders as a static page.
-MUST NOT: `force-cache` on an authenticated request.
+MUST NOT [critical]: cache a user's orders as a static page — the next visitor is served that user's data.
+MUST NOT [critical]: `force-cache` on an authenticated request.
 
 ---
 

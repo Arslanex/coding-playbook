@@ -7,6 +7,8 @@ SCOPE: `src/http/` and how `main.py` wires it. Feature routes and HTTP schemas l
 
 `http/` is the transport shell. This process speaks HTTP. It does not know orders.
 
+MUST NOT: `commit()` anywhere in `http/` — not in middleware, not in a dep, not in a router. The service owns the transaction (06).
+
 ---
 
 ## When code belongs here
@@ -104,13 +106,13 @@ Add a file when the trigger is true:
 Order in `main.py` (outside → inside):
 
 1. `request_id` (context exists before anything logs)
-2. CORS
+2. CORS — unless an edge fronts every browser call and owns the origin list ([Extra 02](extra/02-microservices.md)). One place, never two.
 3. metrics
 4. rate_limit
 5. idempotency (if present)
 6. route → deps → module
 
-MUST: reset contextvars in `finally`. MUST NOT: `commit()`. MUST NOT: call a module service. Logger name: `api` (04).
+MUST: reset contextvars in `finally`. MUST NOT: call a module service. Logger name: `api` (04).
 
 ---
 
@@ -118,7 +120,7 @@ MUST: reset contextvars in `finally`. MUST NOT: `commit()`. MUST NOT: call a mod
 
 Is: who is calling, and which DB session. Not named `auth`.
 
-`get_session` — enter `infra/db/session.py` scope, yield `AsyncSession`, on exit rollback-if-raised then close (06). MUST NOT: `commit()`. MUST NOT: nest a second session.
+`get_session` — enter `infra/db/session.py` scope, yield `AsyncSession`, on exit rollback-if-raised then close (06). MUST NOT: nest a second session.
 
 `get_current_user` — Bearer JWT (secret from `config/`) → `user_id` (and a small `CurrentUser` if more claims are required). Bind `user_id` on log context (04). MUST NOT: login, password, refresh, signup — `modules/auth/`. MUST NOT: `OrderService`. MUST NOT: `HTTPException` with a custom body — raise `AuthenticationError` / `AuthorizationError` (05) and let `http/errors/` map.
 
@@ -136,7 +138,7 @@ Split `deps/` into files only when 01 fires (session vs identity as two reasons 
 
 Is: exception → status + `{error_code, message, details}`. Registered from `main.py`. Four handlers (05). What the client sees: 12. Logger: `api` for expected 4xx, `error` for unhandled 5xx.
 
-MUST NOT: new exception classes here. MUST NOT: a second JSON shape. MUST NOT: a module `except OrderNotFoundError` to build a body.
+MUST NOT: a second JSON shape. MUST NOT: a module `except OrderNotFoundError` to build a body. Exception classes belong to their module or `shared/errors` — 05 owns that rule.
 
 OpenAPI error component lives here, next to the handlers, until 01 split (05).
 

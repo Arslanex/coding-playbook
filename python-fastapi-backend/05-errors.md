@@ -90,8 +90,8 @@ class OrderNotFoundError(NotFoundError):
 
 MUST: `error_code` SCREAMING_SNAKE, unique, prefixed by the noun (`ORDER_…`).
 MUST: `message` in the product language (user-facing; 01). Docstring English (agent).
-MUST: missing and not-owned use the **same** type and 404. A 403 would confirm the id exists.
-MUST: `details` only ids and field names the client may see. MUST NOT: SQL, stack traces, secrets, another user's ids, file paths.
+MUST [critical]: missing and not-owned use the **same** type and 404. A 403 would confirm the id exists.
+MUST: `details` only ids and field names the client may see. MUST NOT [critical]: SQL, stack traces, secrets, another user's ids, file paths.
 
 Raise in the service (or a helper it calls). The router does not catch and wrap.
 

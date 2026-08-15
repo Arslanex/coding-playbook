@@ -1,7 +1,7 @@
 # Extra (optional)
 
 WHEN: the product **already** needs one of the shapes below.
-LOAD: [playbook root](../README.md) and [agents/01-boundary.md](../agents/01-boundary.md) if Extra gate unclear. Then only the matching file below — not all Extra. Do not load Extra with all of `01`–`16` for a routine API change.
+LOAD: [AGENTS.md](../../AGENTS.md) and [agents/01-boundary.md](../../agents/01-boundary.md) if Extra gate unclear. Then only the matching file below — not all Extra. Do not load Extra with all of `01`–`16` for a routine API change.
 
 MUST: `01`–`16` still apply. Extra **adds**. It does not replace `http/` · `modules/` · `infra/` · `workers/`.
 MUST NOT: create `src/extra/`, `src/microservices/`, `src/agents/`, `src/ws/`, `src/outbox/`, `src/sso/`, `src/search/`, `src/webhooks/`, `src/gdpr/` because this folder exists.
@@ -40,4 +40,4 @@ LOAD: [09-webhooks.md](09-webhooks.md).
 WHEN: rows must be hidden, retained, or erased on request **already**.
 LOAD: [10-retention.md](10-retention.md).
 
-Stack map: [../README.md](../README.md). Agent routing: [../agents/README.md](../agents/README.md).
+Stack map: [../README.md](../README.md). Agent routing: [../../agents/README.md](../../agents/README.md).

@@ -2,7 +2,7 @@
 
 WHEN: adding, changing, or dropping a table, column, index, constraint, or seed row.
 LOAD: this file **and** 06 — the revision follows a model change, and 06 decides the column type.
-RELATED: 02 (`infra/db/migrations/` placement) · 16 (index vs query) — open only if the task is also that topic.
+RELATED: 02 (`migrations/` placement) · 16 (index vs query) — open only if the task is also that topic.
 SCOPE: Alembic vs one PostgreSQL database. One revision chain.
 
 A revision is schema history. It must run on a live app that is still on the previous code (rolling deploy).
@@ -12,15 +12,31 @@ A revision is schema history. It must run on a live app that is still on the pre
 ## Folder
 
 ```
-infra/db/migrations/
-  env.py
-  script.py.mako
-  versions/
+backend/
+├── alembic.ini          # script_location = migrations
+├── src/                 # the package. imported and shipped
+├── migrations/          # the chain. never imported
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+└── tests/               # also never imported
 ```
 
-`env.py` imports `DeclarativeBase.metadata` from `models/base.py` and the model package so autogenerate sees tables. MUST NOT: put upgrade logic in `env.py`.
+MUST: `migrations/` beside `src/`, not under `src/infra/db/`. MUST NOT: move it back because a revision "is about Postgres" — so is `session.py`, and that one **is** imported.
+
+Three reasons, in the order that decides it:
+
+1. `src/` is what the application imports and what ships as the package. Nothing under `src/` imports a revision, and a revision imports nothing from the app either (below: no ORM model imports). Beside `src/` is where this repo already puts not-imported code — `tests/` is the precedent.
+2. `alembic.ini` is at the backend root. Root config pointing at a root folder is one tool in one place; pointing four levels into a package splits it.
+3. `versions/` is generated, unbounded, and grows every week. Keeping it out of `src/` keeps `src/` uniformly strict for ruff and mypy with **zero** exclusions (02). A carve-out that exists only to tolerate a folder's location is a sign the folder is in the wrong place.
+
+Cost, stated plainly: the image build must copy `migrations/` as well as `src/`, or the release job's `alembic upgrade head` finds nothing. Same one line `tests/` would need. MUST: the migrate step runs in CI against a real database (14), so a missing copy fails there and not in production.
+
+`env.py` imports `DeclarativeBase.metadata` from `src/infra/db/models/base.py` and the model package so autogenerate sees tables — the package must be installed (or `prepend_sys_path` set in `alembic.ini`), which is true in either layout. MUST NOT: put upgrade logic in `env.py`.
 
 `versions/` — one file per revision. MUST NOT: a `helpers/` dump. A shared concurrent-index helper may live as one file next to `env.py` when a second revision would otherwise copy the same `autocommit_block`.
+
+`versions/` is generated code: it is out of the strict lint/type set; `env.py` and `script.py.mako` are hand-written and stay in it (02). So no tool reads a revision before it ships — step 3 below is the only gate it passes.
 
 ---
 
@@ -109,6 +125,8 @@ If a tiny data fix must live in Alembic, use `sa.table()` / `sa.column()`, batch
 ## Runtime
 
 App start does **not** run migrations. A migrate command (CI or release job) runs `alembic upgrade head` against the database, then pods roll.
+
+Writing the revision is the agent's job. Running it anywhere but a local or test database is not — say what needs running and let the user run it ([agents/01-boundary.md](../agents/01-boundary.md)).
 
 MUST: new environments migrate to `head` before serving traffic.
 MUST: log revision before/after (04: `system` or `audit` if the change is a production cutover). MUST NOT: log the DSN.

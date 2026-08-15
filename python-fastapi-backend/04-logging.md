@@ -82,7 +82,7 @@ Context fields (always in the JSON):
 
 MUST NOT: require `tenant_id` unless the product has tenants. If it does, bind it the same way as `user_id` (null until resolved).
 MUST NOT: pass `request_id` / `user_id` again in `extra=` — the filter injects them. `extra=` is for the event (`order_id`, `job_id`).
-MUST: `extra=` keys that contain `password`, `secret`, `token`, `authorization`, `api_key`, `cookie`, `session`, `otp`, `private_key` are redacted to `***`. Diagnostic keys `error_code` and `status_code` are not redacted.
+MUST [critical]: `extra=` keys that contain `password`, `secret`, `token`, `authorization`, `api_key`, `cookie`, `session`, `otp`, `private_key` are redacted to `***`. Diagnostic keys `error_code` and `status_code` are not redacted.
 
 ---
 

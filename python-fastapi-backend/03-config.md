@@ -83,7 +83,7 @@ Stop at the first yes.
 3. Value differs per environment but a wrong one is only slower (log level, prefetch)?
    → default = the safest production value, not the convenient local one.
 
-MUST NOT: `jwt_secret: str = "changeme"`. A default secret ships to production exactly once.
+MUST NOT [critical]: `jwt_secret: str = "changeme"`. A default secret ships to production exactly once.
 MUST NOT: `debug: bool = True`.
 
 ---
@@ -93,7 +93,7 @@ MUST NOT: `debug: bool = True`.
 MUST: the settings field holds the **value at runtime**, but the value comes from the platform's secret store (env injected by the orchestrator, or a fetch in the settings loader). `.env` is a local-development convenience.
 MUST: `.env` in `.gitignore`. `.env.example` is committed with **names and empty values** only.
 MUST: `SecretStr` for secrets so a stray `repr(settings)` does not print them.
-MUST NOT: a secret in the repo, in a test fixture copied from production, in CI logs, or in a frontend bundle (15).
+MUST NOT [critical]: a secret in the repo, in a test fixture copied from production, in CI logs, or in a frontend bundle (15).
 MUST NOT: log the settings object at startup. Log the **environment name and the config version**, never the values (04).
 
 ---

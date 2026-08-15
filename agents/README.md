@@ -1,8 +1,8 @@
 # Agent operations map
 
 WHEN: you are a **coding agent** (Cursor, Claude Code, Copilot, …) editing application code with this playbook — not an in-product LLM job ([python-fastapi-backend/extra/03-agent-teams.md](../python-fastapi-backend/extra/03-agent-teams.md)).
-LOAD: [playbook root](../README.md) first. Then this map. Then only the files named in the matching WHEN block below.
-SCOPE: routing for coding agents. Human prose at repo root is for users — MUST NOT load unless the user `@`-references it.
+LOAD: [AGENTS.md](../AGENTS.md) first. Then this map. Then only the files named in the matching WHEN block below.
+SCOPE: routing for coding agents. Human prose lives in `for-humans/` — MUST NOT load it unless the user `@`-references that exact file.
 
 MUST NOT: load every file in `agents/` for one edit.
 MUST NOT: load all stack `01`–`16` files for one edit.
@@ -15,11 +15,17 @@ MUST NOT: copy `coding-playbook/` into application `src/`.
 WHEN: any code task begins.
 HOW: load in this order — stop adding files once the turn's topic file is open.
 
-1. [../README.md](../README.md) — root rules, stack list, Extra gates, adapt-in-git
+1. [../AGENTS.md](../AGENTS.md) — entry point: rule strength, stack list, Extra gates, adapt-in-git
 2. [01-boundary.md](01-boundary.md) — once per session (playbook vs app, which stack)
-3. [02-turn.md](02-turn.md) — every turn (parse task, one slice, which numbered file)
-4. Stack README — [python-fastapi-backend](../python-fastapi-backend/README.md) **or** [nextjs-frontend](../nextjs-frontend/README.md)
-5. **One** numbered `01`–`16` file for the task (+ that file's `LOAD:` siblings only)
+3. [08-architecture.md](08-architecture.md) — **only on an empty or new project**. Nothing below runs until its six questions are answered and the data model exists
+4. [06-plan.md](06-plan.md) — **first**, if the task already has a plan. You read it; you do not recall it
+5. [02-turn.md](02-turn.md) — every turn (parse task, one slice, which numbered file)
+6. [05-understand.md](05-understand.md) — once per task, when the code it touches is unfamiliar
+7. Stack README — [python-fastapi-backend](../python-fastapi-backend/README.md) **or** [nextjs-frontend](../nextjs-frontend/README.md)
+8. **One** numbered `01`–`16` file for the task (+ that file's `LOAD:` siblings only)
+9. [07-verify.md](07-verify.md) — every turn, before replying
+
+Steps 4 and 9 bracket the turn: state comes off disk at the start, evidence goes to the user at the end. Neither is optional on a task that spans turns.
 
 ---
 
@@ -37,8 +43,28 @@ LOAD: [03-anti-patterns.md](03-anti-patterns.md) in addition to `02-turn`.
 WHEN: the user pasted **error text**, a **stack trace**, an **HTTP failure**, or a **CI/build log**.
 LOAD: [04-errors.md](04-errors.md) → match first WHEN block inside it → LOAD the stack file its block names.
 
+WHEN: the user describes a **product**, not a change — empty repo, "build me an X", no data model agreed.
+LOAD: [08-architecture.md](08-architecture.md) **before any stack file**. Ask its six questions, produce the data model and architecture, then build in its order.
+MUST NOT: write a file before all six have answers.
+MUST NOT: assume the work fits this playbook — question C asks that, and a mobile app or CLI has no stack here.
+
+WHEN: the code the task touches is **unfamiliar**, a **new noun** is being added, or you are about to assume something you have not checked.
+LOAD: [05-understand.md](05-understand.md). Once per task, before the first edit.
+
+WHEN: the task needs **more than one file**, **more than one turn**, or touches a **migration, auth, or a dependency**. Also every later turn of such a task.
+LOAD: [06-plan.md](06-plan.md).
+MUST: read the plan before any other file. MUST NOT: keep the plan in the conversation.
+
+WHEN: **before every reply** — and the moment you are about to say "done", "fixed", or "should work".
+LOAD: [07-verify.md](07-verify.md).
+MUST NOT: report a result without naming what proves it.
+
+WHEN: about to write a package name into `package.json` / `pyproject.toml`, or touch a lockfile.
+LOAD: [03-anti-patterns.md](03-anti-patterns.md) Dependencies **before** the manifest edit.
+MUST NOT: write a package name into a manifest before confirming it exists.
+
 WHEN: the user only asks **where the human guide is** (onboarding, prompt tips).
-HOW: point to [USER-GUIDE.md](../USER-GUIDE.md) or [HOW-TO-PROMPT.md](../HOW-TO-PROMPT.md).
+HOW: point to [`for-humans/`](../for-humans/README.md) — 01 start here, 02 prompts, 03 reviewing your PRs, 06 glossary.
 MUST NOT: load those files unless `@`-referenced.
 
 ---
@@ -59,90 +85,15 @@ HOW: stop; do not invent layout ([01-boundary.md](01-boundary.md)).
 
 ---
 
-## WHEN → which numbered stack file (pick one primary)
+## WHEN → which numbered stack file
 
-Use [02-turn.md](02-turn.md) for full detail. Quick routing:
+Not here. Each stack README carries its own `WHEN → file` table and is the only copy that is kept current:
 
-WHEN: env var, limit, timeout, secret **name**, pool size.
-WHERE: backend → `03-config` · frontend → `04-config`.
+- [python-fastapi-backend/README.md](../python-fastapi-backend/README.md)
+- [nextjs-frontend/README.md](../nextjs-frontend/README.md)
 
-WHEN: new log line, logger, handler.
-LOAD: backend `04-logging`.
-
-WHEN: exception class, HTTP error JSON, `error_code`.
-LOAD: backend `05-errors` (+ `12-api` if public URL shape).
-
-WHEN: model, repository, session, query.
-LOAD: backend `06-database`.
-
-WHEN: Alembic revision, column/table change.
-LOAD: backend `06-database` + `07-migrations` **same turn**.
-
-WHEN: new infra folder (cache, queue, storage client).
-LOAD: backend `08-infra` (+ `03-config` for settings).
-
-WHEN: new module, service, router in `modules/`.
-LOAD: backend `09-modules` (+ `10-http` if mounting route).
-
-WHEN: mount list, middleware, deps — not business rules.
-LOAD: backend `10-http`.
-
-WHEN: background job, queue, worker, retry/DLQ.
-LOAD: backend `11-workers` (+ owning module `09`).
-
-WHEN: public URL, list page, success JSON, status codes.
-LOAD: backend `12-api`.
-
-WHEN: JWT, login, refresh, authz, Redis identity keys.
-LOAD: backend `13-identity-security` (+ `15-security`).
-
-WHEN: tests, mirror path, fixtures.
-LOAD: stack `14-testing`.
-
-WHEN: PR pass, XSS, uploads, webhooks, secrets checklist.
-LOAD: stack `15-security`.
-
-WHEN: pool/timeout/cap tuning, slow query, cache decision.
-LOAD: backend `16-performance` + `03-config`.
-
-WHEN: new screen, layout, colour, four UI states.
-LOAD: frontend `01-design` **before** other frontend files.
-
-WHEN: split file, naming, no `utils/`.
-LOAD: frontend `02-coding-principles`.
-
-WHEN: where file lives (`app/` vs `features/` vs `ui/` vs `lib/`).
-LOAD: frontend `03-file-structure`.
-
-WHEN: `"use client"`, hooks, server vs client leaf.
-LOAD: frontend `05-server-client`.
-
-WHEN: URL, loading.tsx, metadata, `noindex`.
-LOAD: frontend `06-routing`.
-
-WHEN: server fetch, RSC data, no client GET waterfall.
-LOAD: frontend `07-data`.
-
-WHEN: form, mutation, Server Action shell.
-LOAD: frontend `08-forms` (+ `09-api-client`).
-
-WHEN: fetch wrapper, `/v1`, cookies, `error_code`.
-LOAD: frontend `09-api-client`.
-
-WHEN: new feature package under `features/<noun>/`.
-LOAD: frontend `10-features`.
-
-WHEN: Button, modal, token, primitive.
-LOAD: frontend `11-ui` (+ `01-design`).
-
-WHEN: session cookie, protected route, sign-in UI.
-LOAD: frontend `12-auth`.
-
-WHEN: URL state, store, search params.
-LOAD: frontend `13-state`.
-
-WHEN: RSC, images, bundle, client waterfall.
-LOAD: frontend `16-performance`.
+HOW: open the stack README for the turn, match its WHEN line, load **one** numbered file (+ that file's `LOAD:` siblings only).
+Multi-file combinations for a feature chain (model + migration, service + HTTP + API): [02-turn.md](02-turn.md) *LOAD by task type*.
 
 MUST NOT: open a file's `RELATED:` line unless the task is **also** that topic.
 
@@ -164,11 +115,19 @@ Frontend Extra index: [nextjs-frontend/extra/README.md](../nextjs-frontend/extra
 ## Files in this folder
 
 1. [01-boundary.md](01-boundary.md) — playbook vs app; stack choice; Extra gate; adapt in git
-2. [02-turn.md](02-turn.md) — parse turn; WHERE to edit; HOW to LOAD; config; done check
+2. [02-turn.md](02-turn.md) — parse turn; WHERE to edit; HOW to LOAD; one slice; scope check
 3. [03-anti-patterns.md](03-anti-patterns.md) — MUST NOT behaviors
 4. [04-errors.md](04-errors.md) — fifty errors as WHEN/WHERE/HOW blocks (A01–E50)
+5. [05-understand.md](05-understand.md) — read before write; analyse; check vs assume vs ask; design threshold
+6. [06-plan.md](06-plan.md) — the plan file; read it first; reconcile before acting; one slice at a time
+7. [07-verify.md](07-verify.md) — order of authority; evidence; stop conditions; the reply
+8. [08-architecture.md](08-architecture.md) — new project: the six questions, stack coverage, the two documents, build order, when to revise
 
-Human mirrors (users): [USER-GUIDE.md](../USER-GUIDE.md) · [HOW-TO-PROMPT.md](../HOW-TO-PROMPT.md) · [VIBE-CODING-PITFALLS.md](../VIBE-CODING-PITFALLS.md) · [VIBE-CODING-ERRORS.md](../VIBE-CODING-ERRORS.md).
+`01`–`04` say where to look. `05`–`07` say how to work: what you establish before building, what you write down so it survives, and what you must prove before you claim it. `08` says what to build first, and it runs before all of them on an empty repo.
+
+MUST NOT: load all eight for one edit. The Default LOAD chain above is the order; stop when the turn's topic file is open.
+
+Human mirrors (users): [`for-humans/`](../for-humans/README.md) — EN and TR. MUST NOT: load unless `@`-referenced.
 
 ---
 

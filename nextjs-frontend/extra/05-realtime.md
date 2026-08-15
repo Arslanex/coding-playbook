@@ -12,9 +12,9 @@ SSE if server → client only. WebSocket if both directions. MUST NOT: WebSocket
 
 A **client leaf** opens the stream (05). The page still SSR the current resource (07). The stream patches or calls `router.refresh()`.
 
-MUST NOT: `?token=` on the socket URL (backend 12, 15). Cookie or first-message auth as the API Extra says.
+MUST NOT [critical]: `?token=` on the socket URL — query strings land in proxy and access logs ([backend 15-security](../../python-fastapi-backend/15-security.md)). Cookie or first-message auth as the API Extra says.
 
-MUST NOT: a module global of sockets as the product store (13). MUST NOT: skip 404/authz because a frame arrived.
+MUST NOT: a module global of sockets as the product store (13). MUST NOT [critical]: skip 404/authz because a frame arrived.
 
 Disconnect: show a quiet state, reconnect with backoff from `lib/env.ts`. MUST NOT: a spinner that eats the last good SSR.
 

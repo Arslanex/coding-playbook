@@ -81,7 +81,7 @@ Envelope (every job): `job_id`, `job_type`, `user_id` (nullable if the system en
 
 Body: **ids and scalars** (`order_id`, `storage_key`). Frozen Pydantic / dataclass on the **owning module** (09: this is a DTO — open `dto.py` when the worker imports it). The worker imports that type. The module MUST NOT import `workers/`.
 
-MUST NOT: ORM instance, `AsyncSession`, file bytes, password, token, raw `dict` with no schema.
+MUST NOT [critical]: ORM instance, `AsyncSession`, file bytes, password, token, raw `dict` with no schema.
 MUST NOT: require `tenant_id` unless the product has tenants ([Extra 01](extra/01-multi-tenant.md)). Logs follow the same rule (04).
 New fields: defaulted, so old messages still parse.
 

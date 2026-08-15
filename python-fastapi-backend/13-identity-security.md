@@ -22,7 +22,7 @@ Stop at the first yes.
 2. Profile fields the user edits (`name`, avatar) as a product surface?
    → `modules/users/` when that folder would hurt if deleted. Until then: `AuthService` + `User` model.
 3. "May this user cancel this order?"
-   → owning **module service** (ownership) or `Depends(require_permission("…"))` when a permission table exists. MUST NOT: `if user.role` in the router.
+   → owning **module service** (ownership) or `Depends(require_permission("…"))` when a permission table exists. MUST NOT [critical]: `if user.role` in the router.
 4. GET/SET/TTL/lock against Redis, no product sentence if Redis disappeared?
    → `infra/cache/` (08). The **key and TTL** are chosen by the module (or by `http/` for rate-limit / idempotency / denylist).
 5. GraphQL schema, gRPC proto, "flexible query for the frontend"?
@@ -36,11 +36,11 @@ MUST NOT: `shared/authz/`, `shared/jwt.py`, `infra/redis/`, `http/deps/auth.py` 
 
 Access token: short-lived (minutes, from `config/`). Claims: `sub` = `user_id`, `exp`, `iat`, `jti`. MUST NOT: permissions, email, roles that will go stale. MUST NOT: `tenant_id` unless the product has tenants.
 
-Refresh token: longer-lived, rotated on use. Stored hashed (or as a row id + secret). MUST NOT: put the refresh token in logs or `details` (05).
+Refresh token: longer-lived, rotated on use. Stored hashed (or as a row id + secret). MUST NOT [critical]: put the refresh token in logs or `details` (05).
 
 `modules/auth` **signs**. `http/deps.get_current_user` **verifies** with the same secret/key from `config/` / secret store. External IdP (OIDC/SAML): [Extra 07](extra/07-sso.md) — still mint **our** JWT; MUST NOT: use the IdP access token as the API Bearer. MUST NOT: decode JWT in middleware "to rate-limit by user" if that forces a second decode — rate-limit by IP until identity has run, or reuse the already-verified `CurrentUser` in a later middleware. MUST NOT: a second JWT library.
 
-Bearer in `Authorization`. Browser: access in memory; refresh in HttpOnly Secure cookie **or** rotated in the body — pick one and stay. MUST NOT: access token in `localStorage` as the playbook default (XSS reads it).
+Bearer in `Authorization`. Browser: access in memory; refresh in HttpOnly Secure cookie **or** rotated in the body — pick one and stay. MUST NOT [critical]: access token in `localStorage` as the playbook default (XSS reads it).
 
 Public routes omit `get_current_user`. Login/register are public and **rate-limited** (10).
 

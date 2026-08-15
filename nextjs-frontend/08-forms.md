@@ -11,7 +11,7 @@ SCOPE: how this app **sends** changes. The rule "may cancel if unpaid" stays on 
 
 MUST: POST/PATCH/DELETE FastAPI `/v1/…`. Next is not a second backend.
 
-Server Actions: allowed as a **thin** proxy (`"use server"` function that calls `lib/api.ts` and `revalidatePath` / `redirect`). MUST NOT: a Server Action that contains the business rule, talks to Postgres, or invents a second authz.
+Server Actions: allowed as a **thin** proxy (`"use server"` function that calls `lib/api.ts` and `revalidatePath` / `redirect`). MUST NOT [critical]: a Server Action that contains the business rule, talks to Postgres, or invents a second authz. A Server Action is a public HTTP endpoint anyone can call directly — it inherits nothing from the page that rendered it, so the FastAPI call it makes is the only gate.
 
 MUST NOT: `fetch` from a Client Component as the only write path when the form can be a native `<form action={…}>` — progressive enhancement until 05 forces a client island (autosave, rich widget).
 
@@ -21,7 +21,7 @@ MUST NOT: `fetch` from a Client Component as the only write path when the form c
 
 MUST: Zod for the request body the UI sends, aligned with the API request schema. Shared types: duplicate the fields this screen has, not the whole backend dump.
 
-`extra` fields the API forbids must not be in the form. MUST NOT: hidden `user_id` / `role` the client invents (15).
+`extra` fields the API forbids must not be in the form. MUST NOT [critical]: hidden `user_id` / `role` the client invents — the browser owns that field the moment it exists (15).
 
 ---
 
@@ -29,7 +29,7 @@ MUST: Zod for the request body the UI sends, aligned with the API request schema
 
 One primary submit (01). Errors: map `error_code` to a field when `details.fields` exists; otherwise the form banner uses `message`. MUST NOT: `alert(JSON.stringify(err))`.
 
-Disabled submit while in flight. MUST NOT: double POST without an idempotency key when the API requires one (backend 09).
+Disabled submit while in flight. MUST NOT: double POST without an `Idempotency-Key` when the API requires one ([backend 10-http](../python-fastapi-backend/10-http.md)).
 
 Destructive: noun in the button, confirm (01).
 

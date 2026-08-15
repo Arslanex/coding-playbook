@@ -65,7 +65,7 @@ MUST: all three keys always present. `details` is `{}` when empty — clients MU
 MUST: `message` in the product language (user). MUST: `error_code` SCREAMING_SNAKE (machine). Clients branch on `error_code`, never on `message` text.
 MUST NOT: a second error shape. MUST NOT: `{"detail": "…"}` from FastAPI leaking through — the handler (05) rewrites it.
 
-`details` — ids and field names the caller already knows (`order_id`, `fields: {path: msg}`). MUST NOT: SQL, stack, DSN, file paths, another user's ids, tokens.
+`details` — ids and field names the caller already knows (`order_id`, `fields: {path: msg}`). MUST NOT [critical]: SQL, stack, DSN, file paths, another user's ids, tokens.
 
 Who writes this: `http/errors/` only (05). Router raises nothing as JSON. Service raises a typed error.
 

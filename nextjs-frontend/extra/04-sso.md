@@ -10,9 +10,9 @@ SCOPE: buttons and redirects. This app does not verify the IdP token.
 
 `features/auth`: "Continue with {provider}" → `GET` the FastAPI start URL (09). Callback hits **FastAPI**, which Set-Cookies **our** session (12). Next never holds the IdP access token.
 
-MUST NOT: implicit flow in the browser. MUST NOT: put client secret in `NEXT_PUBLIC_`. MUST NOT: `jwt-decode` the IdP token for the sidebar.
+MUST NOT [critical]: implicit flow in the browser. MUST NOT [critical]: put client secret in `NEXT_PUBLIC_`. MUST NOT [critical]: `jwt-decode` the IdP token for the sidebar.
 
-After callback: redirect same-origin `next` only (15).
+After callback: redirect same-origin `next` only — an open redirect here hands the session to the attacker's host (15). MUST NOT [critical]: accept an absolute URL from `next`.
 
 ---
 

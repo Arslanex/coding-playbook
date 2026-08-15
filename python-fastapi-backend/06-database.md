@@ -18,14 +18,14 @@ infra/db/
     base.py
   repositories/      # thin Base + one class per model
     base.py
-  migrations/        # Alembic
+
+# Alembic is NOT here — migrations/ sits beside src/ (02, 07)
 ```
 
-MUST NOT: `uow.py`. MUST NOT: `engine.py` as a sibling — the engine stays inside `session.py` until 01 split rules fire.
-MUST NOT: a `UnitOfWork` class. The `AsyncSession` is the unit of work.
+MUST NOT: `uow.py`. MUST NOT: `engine.py` as a sibling — the engine stays inside `session.py` until 01 split rules fire. Why there is no unit-of-work file: *Session* below.
 
 MUST: `AsyncSession` only. MUST NOT: sync `Session` inside `async def`.
-MUST: credentials from `config/` / secret store. MUST NOT: DSN in logs, exceptions, or `details` (05).
+MUST: credentials from `config/` / secret store. MUST NOT [critical]: DSN in logs, exceptions, or `details` (05).
 MUST NOT: business rules, HTTP routes, or `commit()` in a repository.
 
 `http/deps` (`deps.py`, 10) yields a session from `session.py`.
@@ -223,7 +223,7 @@ MUST: return a frozen dataclass / Pydantic model (`OrderSummaryRow`) declared ne
 MUST: read only — `select` and nothing else. No `add`, no `flush`, no `commit`.
 MUST: the caller is the owning module's service, which still applies authz and still owns the `WHERE user_id` / tenant filter it passes in (15, [Extra 01](extra/01-multi-tenant.md)).
 MUST NOT: a read repository that spans capabilities nobody owns (`everything_dashboard.py`). If two modules want it, one module owns the screen and the other calls that **service** (09).
-MUST NOT: raw SQL strings unless the query is impossible in the ORM expression language. If it is, keep it in this file with `text()` and bound parameters — never f-strings (15).
+MUST NOT [critical]: raw SQL strings unless the query is impossible in the ORM expression language. If it is, keep it in this file with `text()` and bound parameters — never f-strings (15).
 
 Write ownership is unchanged: `OrderRepository` still owns writes to `orders`. A read repository never becomes the place a second writer appears.
 
@@ -257,7 +257,7 @@ MUST: a test that runs the two concurrent paths for money and for state transiti
 ## Column types that bite
 
 - **Money / any exact decimal** — `Numeric(precision, scale)` in Postgres, `Decimal` in Python. MUST NOT: `float` / `Float` for money. Store the currency next to it; MUST NOT: assume one currency in the column type.
-- **Time** — `DateTime(timezone=True)`, always UTC in the database. Naive `datetime` never crosses a boundary. MUST NOT: `datetime.utcnow()` (naive); use an aware now, injected as a clock where a test must freeze it (14).
+- **Time** — `DateTime(timezone=True)`, always UTC in the database. The code-side rule (aware values only, injected clock) is 01.
 - **Status / enum** — `String` + a `CHECK` constraint, mapped to a Python `Enum`. MUST NOT: a native PostgreSQL `ENUM` type. Adding a value later is a locking `ALTER TYPE` on a hot table (07); a `CHECK` is a cheap constraint swap.
 - **Id** — UUID PK (15). Random v4 scatters index writes; if a table is high-insert, prefer a time-ordered UUID (v7) so the PK index stays local. Either way the value stays opaque to the client. MUST NOT: a sequential integer as the public id.
 - **Text** — `Text` unless a length is a real rule. A `String(255)` that means nothing is a future migration.
@@ -282,7 +282,7 @@ Name the method after the question (`get_open_for_user`, not `filter`). One ques
 
 ## Migrations
 
-Alembic lives in `infra/db/migrations/`. How to write a revision: [07-migrations.md](07-migrations.md).
+Alembic lives in `migrations/` at the backend root, beside `src/` — not under `infra/db/` (02). A model change and its revision still land in the same turn. How to write one: [07-migrations.md](07-migrations.md).
 
 ---
 

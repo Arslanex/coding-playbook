@@ -22,7 +22,7 @@ Stop at the first yes.
 
 MUST NOT: `"use client"` on `app/**/page.tsx` "so hooks work." Split: server `page.tsx` fetches and renders; a client child owns the interactive island.
 
-MUST NOT: import a server-only module (`lib/env.ts` server secrets, `fs`) into a client file.
+MUST NOT [critical]: import a server-only module (`lib/env.ts` server secrets, `fs`) into a client file — the value ends up in the browser bundle. Mark those modules `import "server-only"` so the build fails instead of shipping the secret.
 
 ---
 

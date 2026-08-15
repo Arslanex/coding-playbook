@@ -35,8 +35,7 @@ backend/
 │   │   ├── db/
 │   │   │   ├── session.py
 │   │   │   ├── models/
-│   │   │   ├── repositories/
-│   │   │   └── migrations/
+│   │   │   └── repositories/
 │   │   ├── cache/
 │   │   ├── queue/
 │   │   └── storage/
@@ -44,6 +43,10 @@ backend/
 │   │   └── <capability>/
 │   └── workers/
 │       └── jobs/
+├── migrations/              # Alembic chain. beside src/, not in it (07)
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
 └── tests/
     ├── modules/
     ├── http/
@@ -62,6 +65,8 @@ Helpers exist. A `utils/` folder does not. Named file in the owning module (`tot
 Unknown unit: ask in order. Stop at the first yes.
 Product noun = `orders`, `auth`, `billing`. Not `service`, `api`, `util`.
 
+0. An Alembic revision, `env.py`, or `script.py.mako`?
+   → `migrations/` **beside** `src/`, not inside it. Details: [07-migrations.md](07-migrations.md). It answers yes to 1 as well — this rule wins, because nothing in `src/` imports it.
 1. Exists only because an external system exists (Postgres, Redis, queue, S3, Stripe/SendGrid HTTP)?
    → `infra/` then the matching child. Details: [08-infra.md](08-infra.md).
 2. Business rule, or a product HTTP route/schema about a product noun?
@@ -94,12 +99,64 @@ Tool sections live here too, so there is no `setup.cfg` / `.flake8` / `mypy.ini`
 - `[tool.mypy]` — typed values across boundaries (01) only mean something if they are checked. Strict on `src/`; tests may be looser.
 - `[tool.pytest.ini_options]` — `asyncio_mode = "auto"`, markers, test paths (14).
 
+`src/` stays uniformly strict because generated code is not in it. `migrations/versions/` is written by Alembic, and lint/type rules that are right for hand-written code are noise there — keep it out of `[tool.mypy]`'s strict set the way `tests/` already is.
+
+MUST NOT: exclude the whole `migrations/` folder. `env.py` and `script.py.mako` are hand-written and stay checked; `env.py` importing the wrong metadata is exactly the bug these tools catch (07).
+MUST NOT: loosen strict mode for `src/` because a generated file complains. Nothing generated lives there.
+
 MUST: lint, format-check, type-check and tests all run in CI on the same command set a developer runs locally. A rule that only exists in prose is not enforced.
 MUST NOT: silence a type error with a bare `# type: ignore` — narrow it (`# type: ignore[arg-type]`) or fix the type.
 
-`alembic.ini` — at the **backend root**, not inside the migrations folder. `script_location` points at `src/infra/db/migrations` (07). MUST NOT: a second Alembic config for a "test" chain.
+`alembic.ini` — at the **backend root**, beside the `migrations/` it points at. `script_location = migrations` (07). MUST NOT: a second Alembic config for a "test" chain.
 
 `.env.example` — names of every required setting, empty values, committed. `.env` itself is git-ignored (03, 15).
+
+---
+
+## Dependencies
+
+Pinning above is reproducibility. It is not the whole job — which package, which version, and staying current are also this file's, and none of them is "later."
+
+**Adding one.** MUST: the package exists on the index, is the one you meant, and is maintained — check before writing the name into `pyproject.toml`, not after the import fails. MUST NOT: write a package name from memory. An invented or misremembered name is a name someone may have registered for exactly that mistake ([agents/03-anti-patterns.md](../agents/03-anti-patterns.md)).
+
+MUST: prefer the standard library and what FastAPI/Pydantic/SQLAlchemy already give you. A slug, a retry loop, a UUID, a datetime format is not a dependency. Every added package is a supply-chain surface (15) and a thing to keep current forever.
+
+MUST: CI installs **from** the committed lockfile (the frozen/sync install, not a resolving one). MUST NOT: regenerate the lockfile to make an error go away.
+
+**Choosing the version.** MUST NOT: write a version number from memory. The version you remember is the one current while you were trained — by definition old, and old is where the published advisories are. A correct package name with a stale version passes every rule above.
+
+HOW: let the tool resolve it — `uv add <pkg>` / `poetry add <pkg>` writes the current version and updates the lockfile together. If `pyproject.toml` must be edited by hand, read the current version from the index first.
+MUST NOT: copy a version from a tutorial, an answer, or another project's `pyproject.toml`.
+MUST NOT: guess a range around a remembered number.
+MUST: applies hardest to `fastapi`, `pydantic`, `sqlalchemy`, `alembic` — the ones you are most confident about.
+
+**Keeping current.** An outdated dependency with a known advisory is a security finding, not backlog.
+
+MUST: a dependency audit step runs in CI on every PR. MUST: a high-severity advisory on a package that actually ships blocks merge — fix, upgrade, or write the accepted risk and its expiry in the repo.
+MUST: the base image and the pinned Python are upgraded on a schedule with an owner (08). A pinned old runtime is a CVE list that stops moving, not stability.
+MUST NOT: pin a version **forever** to avoid a migration. Pinning is for reproducible builds, not for skipping upgrades.
+
+Tooling is the project's choice (an audit command, a bot that opens upgrade PRs, a scheduled job) — the rule is that the step exists and a finding has an owner.
+
+---
+
+## Build and release
+
+WHEN: the user asks for a container image, a CI pipeline, or a release step.
+MUST NOT: write any of these unasked ([agents/01-boundary.md](../agents/01-boundary.md)). This section says what they contain **when** asked, not that they should exist.
+
+`Dockerfile` at the backend root. Multi-stage: one stage installs from the lockfile, the final stage copies `src/` **and** `migrations/` (07) and nothing else.
+
+MUST: a base image pinned by digest, not a floating tag. `python:3.12-slim` moves under you; the digest does not, and the upgrade becomes a visible diff (02 *Dependencies*).
+MUST: run as a non-root user.
+MUST: `.dockerignore` excluding `.env`, `.git`, `tests/`, caches. MUST NOT [critical]: a secret baked into a layer — layers are extractable from any pulled image, and deleting the file in a later layer does not remove it.
+MUST: the same image serves the API and the workers — different **command**, not a second build (11).
+MUST: a health endpoint the platform can call that does **not** hit the database on every probe.
+
+MUST NOT: `alembic upgrade head` in the image entrypoint. Migrations are a release job, and two pods starting at once would race (07 *Runtime*).
+
+CI, in this order: install from the lockfile → lint → type-check → tests against a real Postgres (14) → dependency audit (02). Same commands a developer runs locally.
+MUST NOT: a pipeline that runs migrations against production without a human step.
 
 ---
 
@@ -155,7 +212,7 @@ Is: how we talk to a system we do not own the meaning of.
 
 When code belongs here, which child folder, when to open a new folder, naming: [08-infra.md](08-infra.md).
 
-`infra/db/` — PostgreSQL. Details: 06, 07.
+`infra/db/` — PostgreSQL session, models, repositories. Details: 06. The revision chain is **not** here — it is `migrations/` beside `src/` (07).
 `infra/cache/` `infra/queue/` `infra/storage/` — primitives. Details: 08.
 
 MUST NOT: business rules, HTTP routes, or `commit()` in repositories.
@@ -174,7 +231,17 @@ Put elsewhere: SQL → `infra/db/` (06). Vendor HTTP → `infra/` (08). Current 
 
 Is: a consumer. Reads a payload, calls a module service, exits. Stateless. Details: [11-workers.md](11-workers.md).
 
-Put here: the work must not run inside the HTTP request (slow, retryable, fan-out). Consume via `infra/queue/` (08). MUST NOT: worker → repository.
+Put here: the work must not run inside the HTTP request (slow, retryable, fan-out). Consume via `infra/queue/` (08). What a worker may call: *Call chain* below.
+
+### `migrations/` — schema history, beside `src/`
+
+Is: the Alembic chain. `env.py`, `script.py.mako`, `versions/`. How to write a revision: [07-migrations.md](07-migrations.md).
+
+Sits beside `src/` for the same reason `tests/` does: the application never imports it, and it runs from its own command in a release job, not from the app process (07, Runtime). `src/` is what gets imported and shipped as the package; a revision is history that a migrate step replays against a database.
+
+Put here: anything Alembic reads or writes.
+MUST NOT: `src/infra/db/migrations/`. `infra/db/` owns the session, models, and repositories the app imports — the revision chain is not one of them.
+MUST NOT: a second chain (per-module, or a "test" one). One chain per database (07). Several services each owning tables: [Extra 02](extra/02-microservices.md).
 
 ### `tests/` — mirror
 
@@ -212,3 +279,6 @@ MUST NOT: `http/` import a module service except the mount list importing the ro
 - [ ] Test path mirrors `src/`
 - [ ] Call chain still holds
 - [ ] Root has `pyproject.toml` + `alembic.ini` + `.env.example` and no rival config file
+- [ ] New package: verified on the index, version resolved by the tool — no hand-typed version
+- [ ] Alembic chain is `migrations/` beside `src/`, not under `infra/db/`
+- [ ] `src/` has no exclusions; `versions/` is out of the strict set, `env.py` is not

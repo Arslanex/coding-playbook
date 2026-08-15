@@ -46,7 +46,7 @@ The repo root is no longer a single `backend/src`. Each service is a **full** ba
 What **changes** vs one backend:
 
 - CI/deploy is **per** `services/<name>/` (path filter). One service's test run does not boot the others.
-- Each service that owns tables has **its own** `infra/db` + Alembic chain (07). MUST NOT: one `migrations/` for all services.
+- Each service that owns tables has **its own** `infra/db` and **its own** `migrations/` beside that service's `src/` (02, 07). MUST NOT: one `migrations/` for all services. MUST NOT: a shared chain at the repo root that several services replay.
 - `modules/` inside a service holds only that service's nouns. Billing does not contain `modules/orders/`.
 - Cross-service types: event/HTTP DTOs in `packages/events/` (or duplicated frozen schemas until the second consumer). MUST NOT: `packages/models/` of SQLAlchemy.
 - `shared/errors` parents: one small package **or** a copy. Feature errors stay in that service's module (05).
@@ -84,6 +84,75 @@ Idempotency: at-least-once on both Kafka and Rabbit. Consumer **service** is ide
 
 ---
 
+## The edge (outside → in)
+
+The two doors above are service **to** service. This is how the outside gets in, and it is the first thing a third service forces you to decide.
+
+### One public origin
+
+MUST: the browser and the Next server know **one** address. Path prefixes route behind it — `/v1/orders` → orders, `/v1/invoices` → billing.
+
+MUST NOT: a public URL per service. The frontend keeps one `API_BASE_URL` (frontend 04, 09) and one wrapper. Your service topology is not the browser's business, and splitting a service later must not become a frontend change.
+MUST NOT: `NEXT_PUBLIC_ORDERS_URL` + `NEXT_PUBLIC_BILLING_URL`. That publishes the topology to every visitor and breaks frontend 04's rule against a second public env var.
+
+SHOULD: put the UI and the API on the **same** origin (`app.example.com` and `app.example.com/v1/…`). Then there is no CORS at all, and no preflight on every write.
+
+### The edge is platform config, not a service
+
+MUST NOT: a `gateway/` FastAPI or Express process under `services/`. This file already says a service must be the full backbone — `MUST NOT: a service that is only routers`. A routing-only process is exactly that, plus a deploy unit and an on-call page.
+
+WHERE: `deploy/` at the repo root — ingress rules, load balancer or CDN config, or an nginx/Envoy file. Whatever the host already speaks. It holds routing, TLS, and the coarse limit; **not** per-service build files, which stay beside each service (02 *Build and release*).
+MUST NOT: business rules at the edge. No "cancel if unpaid", no response rewriting, no auth decisions.
+MUST NOT: write these files unasked — deploy config is the user's ([agents/01-boundary.md](../../agents/01-boundary.md)).
+
+### What moves there, what stays
+
+At the edge, **once**:
+
+- TLS termination (15 already says "at the platform")
+- Path routing to services, and the public DNS name
+- A coarse anonymous rate limit. Per-service limits **multiply**: three services at 100/min is 300/min to one attacker with no rule broken.
+- `X-Request-ID` generated when the client sent none, so every service shares one id (below)
+- CORS, **if** the UI is on a different origin
+
+In each service, **still**:
+
+- Identity — each service verifies the JWT with the published key (13). MUST NOT: the edge validates and forwards claims as trusted headers. A request that reaches the service another way must fail exactly the same.
+- Authz — the owning service checks ownership (15). The edge never decides who may cancel an order.
+- Named-surface rate limits — login, password reset, OTP (15 layer 3). Those are product limits and they belong with the module that owns them; the edge's coarse limit does not replace them.
+- Idempotency — transport, but the outcome is stored in **that** service's cache (10).
+- `/docs` off in production — per service, because a service reachable directly must not expose it either.
+
+MUST: exactly one place holds the allowed origins. If an edge fronts every browser call, that place is the edge and the services drop their CORS middleware (10 middleware order, item 2). MUST NOT: keep both "just in case" — two lists drift, and the stale one is found by a broken deploy.
+
+### The edge is a convenience, not a control
+
+MUST: everything the edge does must still be safe when the edge is bypassed. A pod is reachable inside the cluster; a misrouted rule sends traffic straight at it; a developer curls it directly.
+
+MUST NOT: move a control to the edge and delete it from the service. Moving CORS is fine — CORS is a browser mechanism and a non-browser caller was never protected by it. Moving **identity or authz** is not.
+
+A hidden button is not a control, and neither is a routing rule. Curl is.
+
+---
+
+## The trace must survive the hop
+
+One backend has one `request_id` per request (10). With several, a single user action becomes N log streams — and unless the id crosses each hop, they cannot be joined. A failure in `billing` caused by an `orders` call is then two unrelated incidents.
+
+MUST: the HTTP client in `infra/<other>_client/` **forwards** the caller's `X-Request-ID` on every outbound call. It does not generate a new one.
+MUST: the receiving service's `request_id` middleware accepts an incoming `X-Request-ID` rather than always minting one (10) — that rule already exists per service; it is what makes forwarding work.
+MUST: the queue envelope already carries `request_id` (above). The consumer **binds** it to its own log context before the job runs (04), so worker lines join the same trace.
+
+MUST NOT: a second correlation header alongside `X-Request-ID`. One id, one name, every service.
+MUST NOT: let the id die at the browser boundary — the frontend already sends it (frontend 09) and reports it on failures (frontend 06). That is the same value end to end.
+
+WHEN: a call fans out to several services or several jobs.
+HOW: `request_id` stays the same for the whole fan-out; per-hop identity is the service name in the log line, not a new id.
+
+MUST NOT: build distributed tracing (spans, a collector, a backend) before this. A forwarded id and structured logs answer "what else happened in this request" for a long time. Tracing is a later decision with its own cost.
+
+---
+
 ## Kafka vs RabbitMQ
 
 The folder is still `infra/queue/` (08). Vendor is a **file** inside (`kafka.py` / `rabbitmq.py`). MUST NOT: `infra/kafka/` + `infra/rabbitmq/` as two capability folders. Two brokers only if they do **different jobs** (log vs task) — then still one `queue/` with two clients, or Extra 02 later if they must scale apart.
@@ -109,3 +178,6 @@ Rules for **both**:
 - [ ] Sync = HTTP from service; async = queue after commit (or [Extra 06](06-outbox.md) outbox)
 - [ ] `infra/queue/` named by capability; Kafka vs Rabbit chosen by log vs task
 - [ ] Consumer is idempotent; payload is ids + envelope
+- [ ] `X-Request-ID` forwarded on every service-to-service call and bound by every consumer
+- [ ] One public origin; frontend still has one `API_BASE_URL`; no `gateway/` service
+- [ ] Identity and authz still in each service; only CORS/TLS/coarse limits moved to the edge

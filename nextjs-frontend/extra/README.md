@@ -1,7 +1,7 @@
 # Extra (optional)
 
 WHEN: the product **already** needs one of the shapes below.
-LOAD: [playbook root](../../README.md) and [agents/01-boundary.md](../../agents/01-boundary.md) if Extra gate unclear. Then only the matching file below — not all Extra.
+LOAD: [AGENTS.md](../../AGENTS.md) and [agents/01-boundary.md](../../agents/01-boundary.md) if Extra gate unclear. Then only the matching file below — not all Extra.
 
 MUST: `01`–`16` still apply. Extra **adds**. It does not replace `app/` · `features/` · `ui/` · `lib/`.
 MUST NOT: create `frontend/extra/`, `app/i18n/` as a city, or backbone folders because this directory exists.

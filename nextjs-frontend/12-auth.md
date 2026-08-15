@@ -11,13 +11,13 @@ FastAPI signs. This app sends the cookie and renders. Authz is still the API (40
 
 ## Cookie
 
-MUST: session/refresh in HttpOnly + Secure + SameSite cookie the API Set-Cookie'd (or the BFF copied). The browser does not read the token for logic.
+MUST [critical]: session/refresh in HttpOnly + Secure + SameSite cookie the API Set-Cookie'd (or the BFF copied). The browser does not read the token for logic.
 
-MUST NOT: access JWT in `localStorage` or `sessionStorage`.
-MUST NOT: `jwt-decode` to show permissions or skip a route. Claims go stale; the API is the gate (backend 13).
-MUST NOT: `Authorization: Bearer` from a token the JS bundle holds, unless Extra says the product has no cookie (then memory only, never localStorage — backend 13).
+MUST NOT [critical]: access JWT in `localStorage` or `sessionStorage` — any XSS on any page then steals the session.
+MUST NOT [critical]: `jwt-decode` to show permissions or skip a route. Claims go stale; the API is the gate (backend 13).
+MUST NOT [critical]: `Authorization: Bearer` from a token the JS bundle holds, unless Extra says the product has no cookie (then memory only, never localStorage — backend 13).
 
-Middleware (`proxy.ts` / `middleware.ts`): may redirect to login when the **cookie is missing**. MUST NOT: treat a present cookie as "this user may open /admin" — still fetch or trust a server layout that asked the API.
+Middleware (`proxy.ts` / `middleware.ts`): may redirect to login when the **cookie is missing**. MUST NOT [critical]: treat a present cookie as "this user may open /admin" — still fetch or trust a server layout that asked the API. Middleware is a redirect, never the gate.
 
 ---
 

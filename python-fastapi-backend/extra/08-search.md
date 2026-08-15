@@ -13,7 +13,7 @@ Default: list endpoints with cursor + `WHERE` (12, 16). Add this Extra when that
 Stop at the first yes.
 
 1. One Postgres, simple ranking (`tsvector`, `pg_trgm`), same rows the module already owns?
-   → Postgres FTS. Index in `infra/db` migrations (07). Query in that model's repository (or a `SearchRepository` that still does not steal writes). **No** `infra/search/` yet.
+   → Postgres FTS. Index created in a revision under `migrations/` (07) — `CONCURRENTLY` on a live table. Query in that model's repository (or a `SearchRepository` that still does not steal writes). **No** `infra/search/` yet.
 2. A search engine (OpenSearch, Typesense, Meilisearch) as an outside system?
    → `infra/search/` client (08). Documents are reconstructible: if the cluster is wiped, a job rebuilds from Postgres.
 

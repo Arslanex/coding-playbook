@@ -1,7 +1,7 @@
 # 15 · Security (never skip)
 
 WHEN: any PR, new route, auth change, upload, webhook, or config/secret. Load **before** merge, not after a finding.
-LOAD: this file only. It is the canonical control list — 13 places identity on the tree, it does not restate these.
+LOAD: this file only. It is the canonical control list: 13 says where identity **lives**, this file says which controls must **exist**. A few authz rules appear in both on purpose — a control worth checking twice is not duplication.
 RELATED: 13 (identity placement) · 05, 12 (error JSON) · 10 (HTTP shell) · 06 (SQL) · 04 (logs) — open only if the task is also that topic.
 SCOPE: controls that must exist on a public backend. Skipping a layer because "the frontend checks it" or "we'll add it later" is a defect.
 
@@ -11,7 +11,7 @@ A hidden button is not a control. A comment is not a control. A layer is code th
 
 ## Layers on a request (do not remove one)
 
-Stop and restore if any layer is missing on a **protected** route.
+Every numbered layer is `[critical]`: each is a secret, another user's data, or an authorization gate. Stop and restore if any is missing on a **protected** route.
 
 1. **Config / secrets** — signing keys, DSN, SMTP from `config/` + secret store. `.env` not in git. MUST NOT: secret in frontend bundle, test fixture copied from prod, or CI log.
 2. **Ingress** — CORS explicit origins when browsers exist (MUST NOT: `*`, especially with credentials). TLS at the platform. `/docs` off in production (`config/`).
@@ -22,6 +22,7 @@ Stop and restore if any layer is missing on a **protected** route.
 7. **Persistence** — UUID PK (06). Parameterised SQL only. MUST NOT: f-string SQL. Cache is reconstructible (13); account truth is Postgres.
 8. **Errors** — only `{error_code, message, details}` (12). MUST NOT: stack, SQL, DSN, token in `details` or `message`. FastAPI `debug` off in production.
 9. **Audit** — login, logout, password change, permission grant, money (`LoggerName.AUDIT`, 04). Passwords never in `extra=`.
+10. **Dependencies and runtime** — every installed package runs in the API process with its DSN, its signing keys, and its database session; there is no sandbox between layer 1 and a transitive dependency. Committed lockfile, CI installing from it, an audit step on every PR, no unowned high-severity advisory, base image and Python upgraded on a schedule (02, 08). A package added by name from memory is the same class of defect as a leaked secret — the name may be someone else's ([agents/03-anti-patterns.md](../agents/03-anti-patterns.md)).
 
 ---
 
@@ -29,17 +30,17 @@ Stop and restore if any layer is missing on a **protected** route.
 
 MUST:
 
-- Argon2id on `password_hash`. Never in `UserResponse`. Login failure message generic (do not say which of email/password failed). Min length enforced **on the server**.
+- **[critical]** Argon2id on `password_hash`. Never in `UserResponse`. Login failure message generic (do not say which of email/password failed). Min length enforced **on the server**.
 - Access JWT short; claims `sub` / `exp` / `jti` only (13). Refresh rotated and revoked on logout. MUST NOT: `?token=` in a URL. MUST NOT: access token in `localStorage` as the default (13).
 - `X-Request-ID` echoed (12). 5xx stack in logs only (`LoggerName.ERROR`).
 - Production `LOG_LEVEL` is not DEBUG.
 
 MUST NOT:
 
-- Admin / staff routes without identity + authz.
+- **[critical]** Admin / staff routes without identity + authz.
 - Sequential integer public ids.
 - Process-local "logged-in users" map (02).
-- Trusting the client for `user_id` in the body when the actor is the Bearer subject.
+- **[critical]** Trusting the client for `user_id` in the body when the actor is the Bearer subject.
 
 ---
 
@@ -70,6 +71,7 @@ Every item true or the change does not merge:
 - [ ] CORS not `*` (if this change touches origins)
 - [ ] Upload/webhook/admin: matching control in "Add when" above is present
 - [ ] Test exists for the 401 / 404-not-owned / validation case that this route introduced (14)
+- [ ] Any new package: verified on the index, lockfile updated deliberately, audit step green (02)
 
 ---
 

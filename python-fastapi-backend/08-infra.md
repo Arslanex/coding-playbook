@@ -37,9 +37,9 @@ infra/
 
 Pick the folder by **what the outside system is for**, not by the vendor name.
 
-`infra/db/` — PostgreSQL. Session, models, repositories, migrations.
-Put here: engine/session, tables, SQL, Alembic.
-Put elsewhere: "cannot cancel if paid" → module. Details: 06, 07.
+`infra/db/` — PostgreSQL. Session, models, repositories.
+Put here: engine/session, tables, SQL.
+Put elsewhere: "cannot cancel if paid" → module. The Alembic chain → `migrations/` beside `src/` (02, 07) — it is the one Postgres thing the app never imports. Details: 06, 07.
 
 `infra/cache/` — key/value + TTL + lock primitives (Redis).
 Put here: get, set, expire, acquire/release lock.
@@ -54,7 +54,7 @@ Put elsewhere: what the job **means** → module. The process that pulls jobs �
 Put here: put, get, delete, signed URL.
 Put elsewhere: "user may upload an invoice" → module. MUST NOT: write user files to local disk (02).
 
-Secrets and DSN construction used by these clients: `config/` + secret store. MUST NOT: hardcode credentials. MUST NOT: log DSN or bytes of objects (04, 05). Pool and timeout for each client: [16-performance.md](16-performance.md).
+Secrets and DSN construction used by these clients: `config/` + secret store. MUST NOT [critical]: hardcode credentials. MUST NOT: log DSN or bytes of objects (04, 05). Pool and timeout for each client: [16-performance.md](16-performance.md).
 
 ---
 
