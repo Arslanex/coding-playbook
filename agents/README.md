@@ -59,6 +59,11 @@ WHEN: **before every reply** — and the moment you are about to say "done", "fi
 LOAD: [07-verify.md](07-verify.md).
 MUST NOT: report a result without naming what proves it.
 
+WHEN: creating or updating product `README.md` / `docs/`; a code change that moves architecture, the data model, a public API, authz, setup, or deploy; a decision that must outlive this task; **or** a version is shipping, a handover, or a project/phase close.
+LOAD: [09-docs.md](09-docs.md).
+MUST: task notes go in the plan ([06-plan.md](06-plan.md)); product truth goes in `docs/`; a playbook rule change goes in the playbook file. MUST NOT: a fourth notes file or the chat.
+MUST NOT: a `final-architecture.md` at ship — reconcile the living docs.
+
 WHEN: about to write a package name into `package.json` / `pyproject.toml`, or touch a lockfile.
 LOAD: [03-anti-patterns.md](03-anti-patterns.md) Dependencies **before** the manifest edit.
 MUST NOT: write a package name into a manifest before confirming it exists.
@@ -122,10 +127,11 @@ Frontend Extra index: [nextjs-frontend/extra/README.md](../nextjs-frontend/extra
 6. [06-plan.md](06-plan.md) — the plan file; read it first; reconcile before acting; one slice at a time
 7. [07-verify.md](07-verify.md) — order of authority; evidence; stop conditions; the reply
 8. [08-architecture.md](08-architecture.md) — new project: the six questions, stack coverage, the two documents, build order, when to revise
+9. [09-docs.md](09-docs.md) — where notes go; the product `docs/` tree; when each file is created; ADRs; same change set as the code
 
-`01`–`04` say where to look. `05`–`07` say how to work: what you establish before building, what you write down so it survives, and what you must prove before you claim it. `08` says what to build first, and it runs before all of them on an empty repo.
+`01`–`04` say where to look. `05`–`07` say how to work: what you establish before building, what you write down so it survives, and what you must prove before you claim it. `08` says what to build first, and it runs before all of them on an empty repo. `09` says which product documents exist and where a note that is not the plan belongs.
 
-MUST NOT: load all eight for one edit. The Default LOAD chain above is the order; stop when the turn's topic file is open.
+MUST NOT: load all nine for one edit. The Default LOAD chain above is the order; stop when the turn's topic file is open.
 
 Human mirrors (users): [`for-humans/`](../for-humans/README.md) — EN and TR. MUST NOT: load unless `@`-referenced.
 

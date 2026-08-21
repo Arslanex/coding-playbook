@@ -130,6 +130,9 @@ LOAD: stack `15-security`; add `14-testing` when tests are in scope.
 WHEN: user adds **SSO or tenant** after the feature already ships.
 LOAD: matching `extra/` file for that stack — not before the feature exists.
 
+WHEN: creating or updating product `README.md` / `docs/`, or the change moves architecture, API, or how the app is run, **or** the task is a ship / handover / close.
+LOAD: [09-docs.md](09-docs.md). Application `docs/`, not this playbook.
+
 ---
 
 ## Done

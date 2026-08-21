@@ -85,6 +85,11 @@ HOW: prefer **separate turns** per stack unless user explicitly combines.
 WHEN: task is **security or PR review**.
 LOAD: stack `15-security`; add `14-testing` if tests are in scope.
 
+WHEN: task is **product docs** (README, `docs/`, an ADR, a changelog, a ship/handover file) **or** the code change moves architecture, the data model, a public API, authz, setup, or deploy.
+WHERE: product `README.md` and `docs/` — not `coding-playbook/`.
+LOAD: [09-docs.md](09-docs.md).
+HOW: the matching doc is in this slice. Task notes stay in the plan.
+
 WHEN: task is **pool, timeout, cap, or performance**.
 LOAD: backend `16-performance` and `03-config` (every cap is a Settings field).
 
@@ -118,6 +123,10 @@ MUST NOT: restate every MUST from loaded files unless user asked for a summary.
 WHEN: adapting a playbook rule for this product.
 WHERE: matching playbook file in `coding-playbook/`.
 HOW: edit the playbook file with a one-line reason, in the same change set as the code. **Edit** it — committing is the user's ([01-boundary.md](01-boundary.md) *WHAT you may run*). Say in your reply that the playbook changed, so they know the diff carries a rule change.
+
+WHEN: the change moves architecture, the data model, a public API, authz, setup, or deploy — or you are writing product `README.md` / `docs/` — or the task is a ship, handover, or close.
+LOAD: [09-docs.md](09-docs.md). The matching product doc is part of this slice.
+MUST NOT: "docs follow later". Task notes stay in the plan ([06-plan.md](06-plan.md)).
 
 ---
 

@@ -3,7 +3,7 @@
 WHEN: a new service or app is starting, the repo is empty or nearly so, or the user describes a **product** rather than a change ("build me an order system", "we need a CRM").
 LOAD: this file and [05-understand.md](05-understand.md). The slices it produces go in [06-plan.md](06-plan.md).
 RELATED: [01-boundary.md](01-boundary.md) for which stack · [03-anti-patterns.md](03-anti-patterns.md) before creating many files.
-SCOPE: the **project** — what is agreed before the first line, what order things get built in, when the agreement is rewritten. One feature's path through the layers is [02-turn.md](02-turn.md), not this file.
+SCOPE: the **project** — what is agreed before the first line, what order things get built in, when the agreement is rewritten. One feature's path through the layers is [02-turn.md](02-turn.md), not this file. Day-one docs: `docs/data-model.md` and `docs/architecture/overview.md`; the rest of the product `docs/` tree is [09-docs.md](09-docs.md).
 
 ---
 
@@ -20,7 +20,7 @@ HOW: ask what the things are, which belongs to which, and how each is created, c
 
 **B · Actors and isolation**
 HOW: ask who uses this, whether roles exist, whether data is shared / per-user / per-organisation, and what a user must **not** see.
-→ `docs/architecture.md`.
+→ `docs/architecture/overview.md`.
 MUST: ask before the first table. Ownership and isolation reach into every query and every service; adding them later means touching all of them.
 
 **C · Coverage**
@@ -33,13 +33,13 @@ HOW: ask how many users or systems at once, how much data, and whether this is a
 
 **E · Fixed constraints**
 HOW: ask what already exists and cannot change — a database, an internal service, a host, a compliance rule.
-→ `docs/architecture.md`.
+→ `docs/architecture/overview.md`.
 MUST: separate "already exists" (a constraint) from "would prefer" (a choice you may argue with).
 MUST NOT: ask which language or framework. This playbook is the stack; the open questions are the database and the outside systems.
 
 **F · First slice, and what is out**
 HOW: ask for the smallest slice a real person could use end to end — **and** what is explicitly not in it.
-→ the slice list in [06-plan.md](06-plan.md), and the out-of-scope line in `docs/architecture.md`.
+→ the slice list in [06-plan.md](06-plan.md), and the out-of-scope line in `docs/architecture/overview.md`.
 MUST NOT: accept "the whole product". MUST NOT: a login screen with nothing behind it.
 
 ---
@@ -52,7 +52,7 @@ MUST NOT: repeat the same question in different words.
 
 WHEN: they still will not choose, or the question is B.
 HOW: state the default in one line and proceed. For B: single tenant, one role, every record owned by its creator, ownership checked in the service.
-MUST: write that default into `docs/architecture.md` as a decision. It is one.
+MUST: write that default into `docs/architecture/overview.md` as a decision. It is one. If a later agent would re-open it, it also becomes an ADR ([09-docs.md](09-docs.md)).
 
 MUST NOT: invent nouns the user did not mention ([03-anti-patterns.md](03-anti-patterns.md)).
 
@@ -83,13 +83,14 @@ MUST NOT: start writing files before that confirmation. MUST NOT: ask for a seco
 
 ## The two documents
 
-WHERE: the **product** repo — `docs/data-model.md` and `docs/architecture.md`. Committed, unlike the task plan: they outlive the task and a human reviews them.
+WHERE: the **product** repo — `docs/data-model.md` and `docs/architecture/overview.md`. Committed, unlike the task plan: they outlive the task and a human reviews them. The rest of `docs/` (setup, ADRs, API, security, deploy) is created when that shape exists — [09-docs.md](09-docs.md). MUST NOT: scaffold those files on day one.
 
 `docs/data-model.md` — nouns, fields, relationships, who owns each row. Enough that a migration can be written from it.
 MUST NOT: a field the product has no use for yet.
 
-`docs/architecture.md` — actors and roles, isolation model, who owns writes and authz (here: FastAPI, always), the outside systems in use **today**, what is out of scope. Ten to thirty lines.
+`docs/architecture/overview.md` — actors and roles, isolation model, who owns writes and authz (here: FastAPI, always), the outside systems in use **today**, what is out of scope. Ten to thirty lines on day one; it grows as components exist ([09-docs.md](09-docs.md)).
 MUST NOT: a diagram of a system nobody asked for.
+MUST NOT: a second file at `docs/architecture.md`.
 
 MUST: both exist before the first migration, and the user has seen them before the first module.
 MUST NOT: keep either in the conversation. The next agent reads the repo.
@@ -150,16 +151,17 @@ WHEN: a noun appears that the data model does not have.
 HOW: `docs/data-model.md`, then the model, then the migration.
 
 WHEN: the actor or isolation model changes — roles appear, tenants appear, sharing appears.
-HOW: `docs/architecture.md` first.
+HOW: `docs/architecture/overview.md` first.
 MUST: treat it as its own task with its own plan. It touches authz in every service. MUST NOT: fold it into a feature.
 
 WHEN: a new outside system is required.
-HOW: `docs/architecture.md` first, with the requirement that pulled it in written next to it (step 5).
+HOW: `docs/architecture/overview.md` first, with the requirement that pulled it in written next to it (step 5).
 
 WHEN: the code has a shape the documents do not describe.
 HOW: reconcile the document, then act — same rule as the plan ([06-plan.md](06-plan.md)). A document that stopped being true is worse than none; the next agent will believe it.
 
 MUST: name any change to either document in your reply. The user agreed to the old one.
+MUST: if a "why" changed, the ADR is in the same change set ([09-docs.md](09-docs.md)).
 MUST NOT: edit the architecture to match a shortcut you already took. That is how a document becomes fiction.
 MUST NOT: expand either document with what the product might need later. They describe what exists and what is committed to next.
 
@@ -172,7 +174,7 @@ MUST: before the first file of a new project —
 - [ ] All six questions have answers — asked once, in one message
 - [ ] Question C answered: the work fits one API + one web UI, or the mismatch was raised before any file
 - [ ] The synthesis was confirmed by the user, assumptions named
-- [ ] `docs/data-model.md` and `docs/architecture.md` exist and the user has seen them
+- [ ] `docs/data-model.md` and `docs/architecture/overview.md` exist and the user has seen them
 - [ ] Defaults chosen on the user's behalf are written down as decisions
 - [ ] The first shippable slice is named, and it is genuinely the smallest one
 - [ ] The plan's slices follow the build order above ([06-plan.md](06-plan.md))

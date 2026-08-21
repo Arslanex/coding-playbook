@@ -14,6 +14,9 @@ You write code from an assumption about the system, not from the system. This fi
 WHEN: about to edit, create, or replace anything.
 HOW: read the file you are editing. List the folder you are adding to. Read the signature you are calling. Read the schema before you query it.
 
+WHEN: the product repo has `docs/` and the change touches a noun, a public URL, authz, how the system is shaped, a ship, handover, or how production is run.
+HOW: read the **one** matching product doc (`docs/data-model.md`, `docs/api.md`, `docs/architecture/overview.md`, `docs/security.md`, the ADR in play, `CHANGELOG.md`, `docs/known-issues.md`, `docs/operations/runbook.md` / `deployment.md` / `slo.md`, or `docs/handover.md`). Not the whole tree. LOAD [09-docs.md](09-docs.md) only when you are creating or updating those files.
+
 MUST NOT: write over a file you have not read in this session. Overwriting an unread file is the one edit that destroys work silently.
 MUST NOT: rely on a summary of a file — yours or another agent's — when the file is one read away.
 
@@ -103,4 +106,5 @@ MUST: before the first edit, confirm —
 - [ ] Anything checkable was checked, not asked and not assumed
 - [ ] Assumptions are written down, in one line each
 - [ ] Questions, if any, were asked once and together
+- [ ] If `docs/` exists for this change, the matching product doc was read ([09-docs.md](09-docs.md))
 - [ ] If the design threshold fired, the design is in the plan and names paths

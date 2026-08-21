@@ -3,7 +3,7 @@
 WHEN: the task needs more than one file, more than one turn, or touches a migration, auth, or a dependency. **And** every later turn of such a task.
 LOAD: this file and [02-turn.md](02-turn.md). Analysis and design that feed the plan: [05-understand.md](05-understand.md).
 RELATED: [07-verify.md](07-verify.md) — a slice is not done until it has evidence.
-SCOPE: the plan file: when to write one, what is in it, and how it stays true. Loaded **every turn** of a planned task.
+SCOPE: the plan file: when to write one, what is in it, and how it stays true. Loaded **every turn** of a planned task. A decision that must outlive the task is an ADR or a playbook line ([09-docs.md](09-docs.md)), not a plan that will be deleted.
 
 Your context is not memory. A decision made three turns ago is not overwritten later — it is gone. Anything that must survive the task lives in a file, not in the conversation.
 
@@ -26,7 +26,7 @@ MUST NOT: a plan for a one-line fix. A ritual that adds nothing is a ritual agen
 
 Default: `.agent/plan.md` in the **product** repo, git-ignored.
 
-It is a file because a file survives the turn, can be re-read, and can be checked. It is git-ignored because it is scaffolding, not history — the decisions worth keeping end up in the playbook and in commit messages.
+It is a file because a file survives the turn, can be re-read, and can be checked. It is git-ignored because it is scaffolding, not history — the decisions worth keeping end up in the product docs / ADRs ([09-docs.md](09-docs.md)), in the playbook, and in commit messages.
 
 MUST NOT: the plan in the chat. That is the thing this file exists to prevent.
 MUST NOT: the plan inside `coding-playbook/`. The playbook is rules; the plan is this task.
@@ -103,6 +103,9 @@ HOW: write it in `## Decisions` **at that moment**, with the reason and where it
 
 MUST: if a decision contradicts a playbook rule, it goes in the **playbook file** too, with a one-line reason ([AGENTS.md](../AGENTS.md), *Not carved in stone*). The plan is deleted when the task ends; the playbook is not, and the next agent reads the playbook.
 
+WHEN: the decision must survive this task as product truth — why this database, why this auth, "we are not doing X".
+HOW: an ADR in `docs/architecture/decisions/` ([09-docs.md](09-docs.md)), written when the decision is made. Point the plan line at that file.
+
 ---
 
 ## Finishing
@@ -124,4 +127,5 @@ MUST: confirm before ending the turn —
 - [ ] Exactly one slice advanced, and it carries an evidence line
 - [ ] Every file touched was named by a slice
 - [ ] New decisions are recorded with their reason
+- [ ] A decision that must survive this task is an ADR or a playbook line ([09-docs.md](09-docs.md)), not only a plan bullet
 - [ ] Anything blocked is in `## Open` **and** in the reply

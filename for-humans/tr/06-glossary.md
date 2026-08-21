@@ -21,6 +21,13 @@ Bir kural dosyası gözünüzde canlanmayan bir şey söylediğinde buraya bakı
 | **`MUST` / `SHOULD`** | İşaretsiz `MUST`, playbook'un seçtiği şekildir — tutarlılık, güvenlik değil. `SHOULD` gerekçeyle sapılabilen bir varsayılandır. |
 | **Dilim (slice)** | Ajanın bir turda yaptığı tek iş birimi: bir özellik, bir hata, bir migration. "Dashboard'u yap" değil. |
 | **Git'te uyarlama** | Bir kural ürününüze uymadığında playbook dosyasını tek satır gerekçeyle değiştirirsiniz — böylece karar sohbet kaydında değil repoda yaşar. |
+| **Ürün dokümanları** | Uygulama reposundaki `README.md` ve `docs/`. Bu playbook değil. İlk gün veri modeli ve mimari özet; kurulum, ADR, API, güvenlik ve deploy o şekil varken yazılır. Ajanlar: [`09-docs.md`](../../agents/09-docs.md). |
+| **ADR** | Architecture Decision Record — `docs/architecture/decisions/ADR-NNN-….md`. Bir seçimin nedeni, reddedilenler, bedeli. "Ne kullanıyoruz"un tekrarı değil. |
+| **Görev planı** | Ürün reposunda `.agent/plan.md`, git-ignore. **Bu** görevin dilimleri ve notları. Görev bitince yaşaması gereken şey burada değil, ürün dokümanında veya playbook'ta durur. |
+| **Release notes** | `CHANGELOG.md` — ne çıktı; kullanıcı ve ürün ekibi için. Deploy runbook'u değil. |
+| **Runbook** | `docs/operations/runbook.md` — production ayaktayken ve değilken nasıl işletilir. Deploy adımları `deployment.md`'de kalır. |
+| **SLO / SLI** | Anlaşılmış operasyon hedefleri (gecikme, hata, uptime) ve onları izleyen dashboard. Uydurulmuş yüzdeler SLO değildir. |
+| **Handover** | `docs/handover.md` — başka ekip ürünü alırken indeks, erişim, kişiler ve nereye dokunmanın riskli olduğu. |
 
 ---
 

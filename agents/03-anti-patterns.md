@@ -32,6 +32,9 @@ MUST NOT: put business rules in `http/`.
 MUST NOT: put product UI as a city under root `app/`.
 LOAD: [frontend 03](../nextjs-frontend/03-file-structure.md).
 
+WHEN: tempted to create the whole product `docs/` tree, a `final-architecture.md`, or a `NOTES.md` / `.agent/notes.md`, because the task might need them later.
+MUST NOT: scaffold empty docs. MUST NOT: a fourth notes file. MUST NOT: a second architecture file at ship. Product docs and where a note goes: [09-docs.md](09-docs.md). The task plan is [06-plan.md](06-plan.md).
+
 WHEN: working on frontend.
 MUST NOT: copy backend folder names (`http/`, `modules/`, `infra/`) into `frontend/`.
 MUST NOT: connect Next.js to Postgres.

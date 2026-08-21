@@ -62,6 +62,8 @@ WHEN: any of these is true, stop and hand back. Continuing costs more than askin
 
 - **The same fix failed twice.** A third attempt is not more effort — it is the wrong diagnosis. Report what you tried and what the errors were.
 - **The change wants a file no slice names.** Update the plan or say it is out of scope ([06-plan.md](06-plan.md)).
+- **Architecture, data model, public JSON, authz, setup, or deploy moved, and the matching product doc did not.** That slice is not met ([09-docs.md](09-docs.md)).
+- **This turn is a ship or handover, and overview / data-model / API still describe the first design, or known-issues is missing while work was left undone.** That slice is not met ([09-docs.md](09-docs.md)).
 - **A `[critical]` rule blocks the requested work.** Say which rule and what it exposes, offer the safe shape, and let the user decide ([AGENTS.md](../AGENTS.md)).
 - **Only the user has the answer.** Finish everything that does not depend on it first ([05-understand.md](05-understand.md)).
 - **`Done when` is met.** Stop. Stopping is the deliverable, not a missed opportunity.

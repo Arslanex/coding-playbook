@@ -54,6 +54,9 @@ LOAD: [agents/04-errors.md](agents/04-errors.md) → then the stack numbered fil
 WHEN: the user describes a **product** rather than a change — empty repo, no agreed data model.
 LOAD: [agents/08-architecture.md](agents/08-architecture.md) **first**. Six questions, then a data model and an architecture the user has seen, then build from the core outward.
 
+WHEN: creating or updating product `README.md` / `docs/`, a code change that moves architecture, data model, API, authz, setup, or deploy, a decision that must outlive this task, **or** a ship / handover / project close.
+LOAD: [agents/09-docs.md](agents/09-docs.md). Task notes stay in the plan ([agents/06-plan.md](agents/06-plan.md)); surviving product truth stays in `docs/`.
+
 WHEN: the code is **unfamiliar**, a **new noun** is being added, or you are about to assume something you did not check.
 LOAD: [agents/05-understand.md](agents/05-understand.md) — once per task, before the first edit.
 
@@ -151,4 +154,5 @@ WHEN: unfamiliar code, new noun, or an unchecked assumption → LOAD [agents/05-
 WHEN: multi-file or multi-turn task → LOAD [agents/06-plan.md](agents/06-plan.md) first, every turn.
 WHEN: before replying → LOAD [agents/07-verify.md](agents/07-verify.md).
 WHEN: new project or empty repo → LOAD [agents/08-architecture.md](agents/08-architecture.md) before any stack file.
+WHEN: product `README.md` / `docs/`, a surviving product decision, **or** a ship / handover / close → LOAD [agents/09-docs.md](agents/09-docs.md).
 

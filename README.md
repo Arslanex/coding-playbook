@@ -57,7 +57,7 @@ Read coding-playbook/AGENTS.md and follow it.
 I want to build: <one or two sentences, plain language>
 
 Before writing any file, ask me the questions in agents/08-architecture.md
-and write docs/data-model.md and docs/architecture.md for me to confirm.
+and write docs/data-model.md and docs/architecture/overview.md for me to confirm.
 ```
 
 **TR**
@@ -67,7 +67,7 @@ coding-playbook/AGENTS.md dosyasını oku ve ona uy.
 Şunu yapmak istiyorum: <bir iki cümle, düz dille>
 
 Herhangi bir dosya yazmadan önce agents/08-architecture.md içindeki soruları
-bana sor ve onaylamam için docs/data-model.md ile docs/architecture.md yaz.
+bana sor ve onaylamam için docs/data-model.md ile docs/architecture/overview.md yaz.
 ```
 
 The agent should come back with **questions, not files**. If it starts writing code, it did not read the playbook.
@@ -136,7 +136,7 @@ Read coding-playbook/AGENTS.md, then agents/04-errors.md.
 |---|---|---|
 | [`for-humans/`](for-humans/README.md) | you | six guides, EN + TR |
 | [`AGENTS.md`](AGENTS.md) | agents | the entry point and routing map |
-| [`agents/`](agents/README.md) | agents | how an agent should work: understand, plan, verify, stop |
+| [`agents/`](agents/README.md) | agents | how an agent should work: understand, plan, verify, stop; which product docs to keep |
 | [`python-fastapi-backend/`](python-fastapi-backend/README.md) | both | 16 rule files + optional Extra shapes |
 | [`nextjs-frontend/`](nextjs-frontend/README.md) | both | 16 rule files + optional Extra shapes |
 

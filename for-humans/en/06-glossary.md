@@ -21,6 +21,13 @@ Read it when a rule file says something you cannot picture. Terms are grouped by
 | **`MUST` / `SHOULD`** | Unmarked `MUST` is the shape this playbook chose — consistency, not safety. `SHOULD` is a default you can deviate from with a reason. |
 | **Slice** | One unit of work an agent does in one turn: one feature, one bug, one migration. Not "build the dashboard." |
 | **Adapt in git** | When a rule doesn't fit your product, you change the playbook file with a one-line reason — so the decision lives in the repo, not in a chat log. |
+| **Product docs** | `README.md` and `docs/` in the **application** repo. Not this playbook. Day one is the data model and architecture overview; setup, ADRs, API, security, and deploy appear when that shape exists. Agents: [`09-docs.md`](../../agents/09-docs.md). |
+| **ADR** | Architecture Decision Record — `docs/architecture/decisions/ADR-NNN-….md`. Why a choice was made, what was rejected, and what it costs. Not a restatement of "what we use". |
+| **Task plan** | `.agent/plan.md` in the product repo, git-ignored. Slices and notes for **this** task. Surviving truth goes in product docs or the playbook, not here. |
+| **Release notes** | `CHANGELOG.md` — what shipped, for users and the product team. Not the deploy runbook. |
+| **Runbook** | `docs/operations/runbook.md` — how production is operated when it is up, and when it is not. Deploy steps stay in `deployment.md`. |
+| **SLO / SLI** | Agreed operational targets (latency, errors, uptime) and the dashboard that watches them. Invented percentages are not SLOs. |
+| **Handover** | `docs/handover.md` — index plus access, people, and what is risky to touch, when another team takes the product. |
 
 ---
 

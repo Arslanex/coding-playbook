@@ -35,6 +35,38 @@ Bu klasör **uygulama kaynak kodu değildir**. Tümünü `src/` içine kopyalama
 
 6. **Ajanları playbook'a yönlendirin.** Cursor (veya benzeri) içinde kural veya `@` referansı verin: önce [`README.md`](../../README.md), sonra ilgili yığın README'si, en son yalnızca o görevle ilgili numaralı dosya. Ajanlar on altı dosyanın veya tüm Extra konularının tamamını aynı anda yüklememelidir. Prompt şablonları, config tuzakları ve uzun sohbet çözümleri: **[02 Prompt yazımı](02-how-to-prompt.md)**.
 
+## Ürün dokümanları
+
+Bu playbook kurallardır. **Uygulama reposunun** kendi README'si ve `docs/` klasörü hâlâ gerekir — sonraki kişinin (ve sonraki ajanın) *sizin* ürününüz hakkında okuduğu yer orasıdır.
+
+Mimari sorulardan sonra ilk gün: `docs/data-model.md` ve `docs/architecture/overview.md`. Ağacın geri kalanı o şekil var olduğunda yazılır, boş şablon olarak değil. Ajanlar [`agents/09-docs.md`](../../agents/09-docs.md) dosyasına uyar. Görev notları sohbette değil, git-ignore edilen `.agent/plan.md` içindedir.
+
+```
+repo/
+├── README.md                          # indeks, teknik doküman değil
+├── CHANGELOG.md                       # ne çıktı, kullanıcı için
+└── docs/
+    ├── data-model.md                  # isimler → ER / validasyon büyür
+    ├── api.md                         # herkese açık HTTP sözleşmesi varken
+    ├── security.md                    # kimlik veya kişisel veri varken
+    ├── known-issues.md                # ilk yayın veya teslim — ne bitmedi
+    ├── handover.md                    # başka ekip ürünü alırken
+    ├── lessons-learned.md             # proje veya faz kapanırken
+    ├── architecture/
+    │   ├── overview.md                # sistem *şu an* nasıl çalışıyor
+    │   └── decisions/                 # ADR: neden, ne değil
+    ├── development/
+    │   ├── setup.md
+    │   ├── development-guide.md
+    │   └── testing.md
+    └── operations/
+        ├── deployment.md              # nasıl yayınlarız, nasıl tekrarlarız
+        ├── runbook.md                 # production nasıl işletilir
+        └── slo.md                     # anlaşılmış hedefler, varken
+```
+
+Bu dosyaların hiçbirine secret koymayın. Kodun mimarisi veya API'si değiştiyse eşleşen doküman aynı değişiklikle gider. Yayın veya teslimde: yaşayan mimari / veri modeli / API güncellenir — ayrı bir "final architecture" dosyası açılmaz. Known issues, teslimin her şeyin bittiği izlenimini vermesin diye vardır.
+
 ## Sık senaryolar
 
 | Amaç | Nereden başlanır |
@@ -43,6 +75,7 @@ Bu klasör **uygulama kaynak kodu değildir**. Tümünü `src/` içine kopyalama
 | Yeni Next.js uygulaması | `nextjs-frontend/01` (tasarım) → `02` → `03`, ardından konu dosyaları |
 | Code review kontrol listesi | İlgili yığında `15-security.md` ve `14-testing.md` |
 | Sonradan SSO / tenant / agent | Özellik **vardıktan sonra** `extra/` altındaki eşleşen dosya |
+| Yayın, teslim veya proje kapanışı | [`agents/09-docs.md`](../../agents/09-docs.md) — changelog, known issues, runbook; yaşayan dokümanlar, yeni mimari dosyası değil |
 
 ## İnsan okuyucu olarak nelere takılmayın
 

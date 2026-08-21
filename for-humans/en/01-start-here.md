@@ -35,6 +35,38 @@ It is **not** application source code. Do not copy the whole folder into `src/`.
 
 6. **Point agents at the playbook.** In Cursor (or similar), add a rule or `@` reference: load [`README.md`](../../README.md) first, then the stack README, then only the numbered file for the current task. Agents should not load all sixteen files or every Extra topic at once. For prompt templates, config pitfalls, and long-chat fixes: **[02 How to prompt](02-how-to-prompt.md)**.
 
+## Product documentation
+
+This playbook is rules. The **application repo** still needs its own README and `docs/` — that is what the next person (and the next agent) reads about *your* product.
+
+Day one, after the architecture questions: `docs/data-model.md` and `docs/architecture/overview.md`. The rest of the tree is created when that shape exists, not as empty stubs. Agents follow [`agents/09-docs.md`](../../agents/09-docs.md). Task notes live in `.agent/plan.md` (git-ignored), not in chat.
+
+```
+repo/
+├── README.md                          # index, not the technical document
+├── CHANGELOG.md                       # what shipped, for users
+└── docs/
+    ├── data-model.md                  # nouns → grows ER / validation
+    ├── api.md                         # when a public HTTP contract exists
+    ├── security.md                    # when auth or personal data exists
+    ├── known-issues.md                # first ship or handover — what is unfinished
+    ├── handover.md                    # when another team takes the product
+    ├── lessons-learned.md             # when a project or phase closes
+    ├── architecture/
+    │   ├── overview.md                # how the system works *now*
+    │   └── decisions/                 # ADRs: why, not what
+    ├── development/
+    │   ├── setup.md
+    │   ├── development-guide.md
+    │   └── testing.md
+    └── operations/
+        ├── deployment.md              # how we publish, and publish again
+        ├── runbook.md                 # how production is operated
+        └── slo.md                     # agreed targets, when they exist
+```
+
+Do not put secrets in any of these files. If the code's architecture or API moves, the matching doc moves in the same change. At ship or handover: update the living architecture / data-model / API — do not open a "final architecture" file. Known issues exist so a delivery cannot look complete when it is not.
+
 ## Typical workflows
 
 | Goal | Where to start |
@@ -43,6 +75,7 @@ It is **not** application source code. Do not copy the whole folder into `src/`.
 | New Next.js app | `nextjs-frontend/01` (design) → `02` → `03`, then topic files |
 | Code review checklist | `15-security.md` and `14-testing.md` for that stack |
 | Add SSO / tenants / agents later | Matching file under `extra/` **after** the feature exists |
+| Ship, handover, or close a project | [`agents/09-docs.md`](../../agents/09-docs.md) — changelog, known issues, runbook; living docs, not a new architecture file |
 
 ## What to ignore as a human reader
 
