@@ -72,6 +72,9 @@ LOAD: [python-fastapi-backend/README.md](python-fastapi-backend/README.md) → *
 WHEN: editing **TypeScript/React/Next** under `frontend/`.
 LOAD: [nextjs-frontend/README.md](nextjs-frontend/README.md) → **one** numbered `01`–`16` file for the task (+ its `LOAD:` siblings only). Visual work: frontend `01-design` before other frontend files.
 
+WHEN: editing **Astro** (`.astro`, its browser scripts, its CSS) under `frontend/`.
+LOAD: [astro-frontend/README.md](astro-frontend/README.md) → the one file its map names. It borrows `01-design`, `02-coding-principles`, `11-ui`, `14`, `15`, `16` from `nextjs-frontend/` and replaces the App-Router files. MUST NOT: apply `nextjs-frontend` `04`–`13` to an Astro page.
+
 WHEN: product **already ships** an Extra shape (tenant, SSO, in-product agents, search, …).
 LOAD: matching `extra/NN-….md` for that stack **in addition to** the numbered file — not instead of `01`–`16`.
 
@@ -108,6 +111,7 @@ How to change a playbook file: keep `WHEN` / `LOAD` / `MUST` / `MUST NOT`. Chang
 
 1. Python + FastAPI API / workers — [python-fastapi-backend/README.md](python-fastapi-backend/README.md)
 2. Next.js UI — [nextjs-frontend/README.md](nextjs-frontend/README.md)
+3. Astro SSR UI — [astro-frontend/README.md](astro-frontend/README.md) (added for GİRVAK: the site ships Astro, and the Next.js rules encode App Router behaviour Astro has no equivalent for)
 
 No matching stack: stop. Do not invent a parallel layout from another stack. If this repo needs a new stack, add a folder and one line here — then write its map the same way.
 

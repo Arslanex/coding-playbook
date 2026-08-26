@@ -4,6 +4,7 @@ WHEN: creating a file, folder, or deciding where code belongs.
 LOAD: this file only. Then the numbered file that Decide points at.
 RELATED: 01 (how to write) · 03 (what goes in `config/`) — open only if the task is also that topic.
 SCOPE: the application `backend/` tree this stack describes. Do not invent a parallel tree. This playbook folder is `python-fastapi-backend/`; do not name the app after it.
+ADAPTED (GİRVAK, this repo): the layers live one level down, in `src/<package>/`, because a top-level `src/http/` shadows the stdlib `http` module for every library in the process (starlette does `from http import HTTPStatus`) and the app cannot boot. Folder names and every rule below are unchanged; imports are `<package>.http`, `<package>.modules.…`.
 
 MUST: first matching yes in Decide. MUST NOT: add a top-level folder not in the tree.
 MUST NOT: `utils/` · `helpers/` · `common/` anywhere. A helper lives in the module that uses it.
@@ -21,28 +22,29 @@ backend/
 ├── alembic.ini
 ├── .env.example
 ├── src/
-│   ├── main.py
-│   ├── config/
-│   ├── shared/
-│   │   ├── errors/
-│   │   └── logging/
-│   ├── http/
-│   │   ├── router.py
-│   │   ├── deps.py
-│   │   ├── middleware/
-│   │   └── errors/
-│   ├── infra/
-│   │   ├── db/
-│   │   │   ├── session.py
-│   │   │   ├── models/
-│   │   │   └── repositories/
-│   │   ├── cache/
-│   │   ├── queue/
-│   │   └── storage/
-│   ├── modules/
-│   │   └── <capability>/
-│   └── workers/
-│       └── jobs/
+│   └── <package>/           # one root package. `src/http/` would shadow stdlib http
+│       ├── main.py
+│       ├── config/
+│       ├── shared/
+│       │   ├── errors/
+│       │   └── logging/
+│       ├── http/
+│       │   ├── router.py
+│       │   ├── deps.py
+│       │   ├── middleware/
+│       │   └── errors/
+│       ├── infra/
+│       │   ├── db/
+│       │   │   ├── session.py
+│       │   │   ├── models/
+│       │   │   └── repositories/
+│       │   ├── cache/
+│       │   ├── queue/
+│       │   └── storage/
+│       ├── modules/
+│       │   └── <capability>/
+│       └── workers/
+│           └── jobs/
 ├── migrations/              # Alembic chain. beside src/, not in it (07)
 │   ├── env.py
 │   ├── script.py.mako
