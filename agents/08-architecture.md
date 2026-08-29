@@ -3,7 +3,7 @@
 WHEN: a new service or app is starting, the repo is empty or nearly so, or the user describes a **product** rather than a change ("build me an order system", "we need a CRM").
 LOAD: this file and [05-understand.md](05-understand.md). The slices it produces go in [06-plan.md](06-plan.md).
 RELATED: [01-boundary.md](01-boundary.md) for which stack · [03-anti-patterns.md](03-anti-patterns.md) before creating many files.
-SCOPE: the **project** — what is agreed before the first line, what order things get built in, when the agreement is rewritten. One feature's path through the layers is [02-turn.md](02-turn.md), not this file. Day-one docs: `docs/data-model.md` and `docs/architecture/overview.md`; the rest of the product `docs/` tree is [09-docs.md](09-docs.md).
+SCOPE: the **project** — what is agreed before the first line, what order things get built in, when the agreement is rewritten. One feature's path through the layers is [02-turn.md](02-turn.md), not this file. Day-one docs: `docs/architecture/data-model.md` and `docs/architecture/overview.md`; the rest of the product `docs/` tree is [09-docs.md](09-docs.md).
 
 ---
 
@@ -16,7 +16,7 @@ MUST NOT: six rounds of question-and-confirm. One round of questions, one confir
 
 **A · Nouns and ownership**
 HOW: ask what the things are, which belongs to which, and how each is created, changed, and ended.
-→ `docs/data-model.md`.
+→ `docs/architecture/data-model.md`.
 
 **B · Actors and isolation**
 HOW: ask who uses this, whether roles exist, whether data is shared / per-user / per-organisation, and what a user must **not** see.
@@ -83,9 +83,9 @@ MUST NOT: start writing files before that confirmation. MUST NOT: ask for a seco
 
 ## The two documents
 
-WHERE: the **product** repo — `docs/data-model.md` and `docs/architecture/overview.md`. Committed, unlike the task plan: they outlive the task and a human reviews them. The rest of `docs/` (setup, ADRs, API, security, deploy) is created when that shape exists — [09-docs.md](09-docs.md). MUST NOT: scaffold those files on day one.
+WHERE: the **product** repo — `docs/architecture/data-model.md` and `docs/architecture/overview.md`. Committed, unlike the task plan: they outlive the task and a human reviews them. The rest of `docs/` (setup, ADRs, API, security, deploy) is created when that shape exists — [09-docs.md](09-docs.md). MUST NOT: scaffold those files on day one.
 
-`docs/data-model.md` — nouns, fields, relationships, who owns each row. Enough that a migration can be written from it.
+`docs/architecture/data-model.md` — nouns, fields, relationships, who owns each row. Enough that a migration can be written from it.
 MUST NOT: a field the product has no use for yet.
 
 `docs/architecture/overview.md` — actors and roles, isolation model, who owns writes and authz (here: FastAPI, always), the outside systems in use **today**, what is out of scope. Ten to thirty lines on day one; it grows as components exist ([09-docs.md](09-docs.md)).
@@ -109,7 +109,7 @@ MUST NOT: a business rule anywhere in step 0.
 MUST NOT: a `Dockerfile`, compose file, or CI workflow unless the user asked ([01-boundary.md](01-boundary.md)). If the test database needs a container the project lacks, give the command and stop.
 
 **1 · Data model** — the core.
-WHERE: models for the nouns the first slice needs (06) and the first migration (07), same turn. `docs/data-model.md` becoming code.
+WHERE: models for the nouns the first slice needs (06) and the first migration (07), same turn. `docs/architecture/data-model.md` becoming code.
 MUST NOT: tables for nouns beyond the first slice. An unused table is a migration you will undo.
 
 **2 · Domain** — the product itself.
@@ -148,7 +148,7 @@ MUST NOT: return to step 0 to "improve the foundation" without a requirement for
 WHEN: any of the four below. The document changes **first**, then the code.
 
 WHEN: a noun appears that the data model does not have.
-HOW: `docs/data-model.md`, then the model, then the migration.
+HOW: `docs/architecture/data-model.md`, then the model, then the migration.
 
 WHEN: the actor or isolation model changes — roles appear, tenants appear, sharing appears.
 HOW: `docs/architecture/overview.md` first.
@@ -174,7 +174,7 @@ MUST: before the first file of a new project —
 - [ ] All six questions have answers — asked once, in one message
 - [ ] Question C answered: the work fits one API + one web UI, or the mismatch was raised before any file
 - [ ] The synthesis was confirmed by the user, assumptions named
-- [ ] `docs/data-model.md` and `docs/architecture/overview.md` exist and the user has seen them
+- [ ] `docs/architecture/data-model.md` and `docs/architecture/overview.md` exist and the user has seen them
 - [ ] Defaults chosen on the user's behalf are written down as decisions
 - [ ] The first shippable slice is named, and it is genuinely the smallest one
 - [ ] The plan's slices follow the build order above ([06-plan.md](06-plan.md))

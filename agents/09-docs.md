@@ -3,7 +3,7 @@
 WHEN: you are creating or updating `README.md` or `docs/` in the **product** repo; a code change that moves architecture, the data model, a public API, authz, how the app is run, or how it is deployed; a decision that must survive this task; you are about to write a note so a later turn "remembers"; **or** a version is shipping, production is being handed over, or a project/phase is closing.
 LOAD: this file. The two day-one documents: [08-architecture.md](08-architecture.md). The task plan (not a product doc): [06-plan.md](06-plan.md).
 RELATED: [05-understand.md](05-understand.md) — read the matching product doc before assuming · [07-verify.md](07-verify.md) — a doc that no longer matches the code is an unmet slice.
-SCOPE: where writing goes, and the committed docs tree in the product repo. Reason this file exists: 08 only names the two day-one documents; the rest of `docs/` and the difference between a task note and a product doc had no home. Ship/handover files were added so a delivery does not look finished when debt and runbooks are missing.
+SCOPE: where writing goes, and the committed docs tree in the product repo. Reason this file exists: 08 only names the two day-one documents; the rest of `docs/` and the difference between a task note and a product doc had no home. Ship/handover files were added so a delivery does not look finished when debt and runbooks are missing. ADAPTED (GİRVAK): day-one data model lives at `docs/architecture/data-model.md` beside `overview.md`, not at `docs/data-model.md`. HTTP contract lives at `docs/architecture/api.md` beside overview and data-model. Version roadmap lives at `docs/plan/backend/` and `docs/plan/frontend/` (`v1.md`, `v2.md`, … with checkbox slices) — not in `.agent/plan.md`. Product art direction lives at `docs/design/` (`README.md` + one or more named system files, e.g. `swiss-editorial.md`) — not in the playbook and not in `docs/architecture/`.
 
 Your context is not memory. Chat is not a filing cabinet. Anything that must outlive this turn is a file, and the file's **kind** decides whether it is ignored, committed as product truth, or written into this playbook.
 
@@ -46,17 +46,28 @@ repo/
 ├── README.md
 ├── CHANGELOG.md                       # when a version ships to users
 ├── docs/
-│   ├── data-model.md
-│   ├── api.md                         # when a public HTTP contract exists
 │   ├── security.md                    # when auth or personal data exists
 │   ├── known-issues.md                # first ship or handover — what is unfinished
 │   ├── handover.md                    # when leaving the product to another team
 │   ├── lessons-learned.md             # when a project or phase closes
 │   ├── architecture/
 │   │   ├── overview.md
+│   │   ├── data-model.md              # nouns → grows ER / validation
+│   │   ├── api.md                     # when a public HTTP contract exists
 │   │   └── decisions/
 │   │       ├── ADR-001-short-kebab.md
 │   │       └── ADR-002-short-kebab.md
+│   ├── plan/
+│   │   ├── README.md                  # index — version roadmap, not task scaffolding
+│   │   ├── backend/
+│   │   │   ├── v1.md                  # checkbox slices for backend v1
+│   │   │   └── v2.md                  # backend backlog
+│   │   └── frontend/
+│   │       ├── v1.md                  # checkbox slices for frontend v1
+│   │       └── v2.md                  # frontend backlog
+│   ├── design/
+│   │   ├── README.md                  # index — when to load; link to system doc(s)
+│   │   └── <system-name>.md           # product art direction (e.g. swiss-editorial.md)
 │   ├── development/
 │   │   ├── setup.md
 │   │   ├── development-guide.md
@@ -73,7 +84,7 @@ MUST NOT: a parallel tree (`documentation/`, `wiki/`, `adr/` at repo root) while
 WHEN: the product already shipped a different docs layout.
 HOW: adapt this file with a one-line reason ([AGENTS.md](../AGENTS.md), *Not carved in stone*) — MUST NOT: silently write the old paths.
 
-OpenAPI YAML/JSON, if it is a file, lives next to the code that serves it (backend). `docs/api.md` says **where**, and the generate command if it is produced from annotations. MUST NOT: a hand-copied spec that drifts from the running app.
+OpenAPI YAML/JSON, if it is a file, lives next to the code that serves it (backend). `docs/architecture/api.md` says **where**, and the generate command if it is produced from annotations. MUST NOT: a hand-copied spec that drifts from the running app.
 
 ---
 
@@ -84,13 +95,15 @@ MUST NOT: scaffold the tree with empty heading stubs on day one. A file with onl
 | File | Create when | Not before |
 |---|---|---|
 | `README.md` | first commit of the product | — |
-| `docs/data-model.md` | 08's six questions are answered | any migration |
+| `docs/architecture/data-model.md` | 08's six questions are answered | any migration |
 | `docs/architecture/overview.md` | 08's six questions are answered | any module |
 | `docs/architecture/decisions/ADR-*.md` | a choice a later agent would re-open | "we use X" as a fact already in overview |
 | `docs/development/setup.md` | the skeleton can be run locally (08 step 0) | secrets exist to paste |
 | `docs/development/development-guide.md` | the first PR, or a convention this product has that the playbook does not | copying the playbook into prose |
 | `docs/development/testing.md` | tests exist | inventing a coverage number |
-| `docs/api.md` | the first public URL exists | the data model is still only nouns |
+| `docs/architecture/api.md` | the first public URL exists | the data model is still only nouns |
+| `docs/plan/README.md` + `docs/plan/{backend,frontend}/v*.md` | the first version roadmap is agreed (usually with 08) | empty checkbox stubs before scope exists |
+| `docs/design/README.md` + `docs/design/<system-name>.md` | frontend UI work is in scope and art direction is agreed | empty typography/grid stubs before a public site exists |
 | `docs/security.md` | identity exists, or a column holds personal data | an empty RBAC matrix |
 | `docs/operations/deployment.md` | a real environment besides local, or a release job | a `Dockerfile` nobody asked for |
 | `CHANGELOG.md` | a version ships to users | a feature list copied into the deploy doc |
@@ -101,7 +114,7 @@ MUST NOT: scaffold the tree with empty heading stubs on day one. A file with onl
 | `docs/lessons-learned.md` | a project or a named phase closes | a blame list or a secret from a postmortem |
 
 WHEN: 08 is running (new product, no code yet).
-HOW: write **only** `docs/data-model.md` and `docs/architecture/overview.md`, and the user has seen them. README if the repo has none — short, as the index below. Nothing else in this tree until the row above matches.
+HOW: write **only** `docs/architecture/data-model.md` and `docs/architecture/overview.md`, and the user has seen them. README if the repo has none — short, as the index below. Nothing else in this tree until the row above matches.
 
 WHEN: a version is shipping, or the product is handed over.
 HOW: the ship files below. MUST: living architecture / data-model / API describe **the running system**, not the first design — reconcile, do not open a `final-architecture.md`.
@@ -124,6 +137,7 @@ Headings:
 - Local setup (link `docs/development/setup.md` once that file exists)
 - How to run
 - How to run tests (link `docs/development/testing.md` once that file exists)
+- Design / UI system (link `docs/design/README.md` once frontend art direction exists)
 - Repository layout
 - Links to the docs that exist **today**
 - Ownership / who to ask
@@ -277,11 +291,11 @@ MUST NOT: user-facing feature lists here — those belong in `CHANGELOG.md`.
 
 ---
 
-## docs/data-model.md and docs/api.md
+## docs/architecture/data-model.md and docs/architecture/api.md
 
-Living data model and API contract. Two files so day one stays small; they link to each other.
+Living data model and API contract. Architecture folder holds overview, data model, and HTTP contract so day one stays small; they link to each other.
 
-### data-model.md (day one — 08)
+### architecture/data-model.md (day one — 08)
 
 Enough that a migration can be written from it: nouns, fields, relationships, who owns each row.
 
@@ -295,7 +309,7 @@ MUST NOT: a column the product has no use for yet ([08-architecture.md](08-archi
 WHEN: a noun appears that this file does not have.
 HOW: this file first, then the model, then the migration — same change set.
 
-### api.md (first public URL)
+### architecture/api.md (first public URL)
 
 Headings:
 
@@ -307,6 +321,97 @@ Headings:
 
 MUST: examples match the running schemas. A sample payload that the schema rejects is a bug in this file.
 MUST NOT: duplicate every field in prose that OpenAPI already lists. This file orients; the spec is the contract.
+
+---
+
+## docs/plan/
+
+Question: what ships in each version, per stack?
+
+Committed version roadmap — not task scaffolding (that stays in `.agent/plan.md`, [06-plan.md](06-plan.md)).
+
+```
+docs/plan/
+├── README.md              # index
+├── backend/
+│   ├── v1.md              # checkbox slices — backend v1
+│   └── v2.md              # backlog — not in v1 slices
+└── frontend/
+    ├── v1.md
+    └── v2.md
+```
+
+MUST: each `vN.md` uses checkbox lists (`- [ ]` / `- [x]`) for slices and a short *Done when* for the release.
+MUST: check an item only when evidence exists (tests, manual check, docs match code) — same bar as [07-verify.md](07-verify.md).
+MUST: update the matching `vN.md` when a version slice completes — same change set as the code.
+MUST NOT: duplicate the full task plan from `.agent/plan.md`; the plan is ephemeral, `docs/plan/` is product truth.
+
+WHEN: a new major version is scoped.
+HOW: add `vN.md` under the stack folder; move backlog items from the previous `v(N+1).md` or `v2.md` as needed.
+
+---
+
+## docs/design/
+
+Question: what does **this product's public UI** look and feel like?
+
+Product visual and interaction system for the frontend — grid, typography, color, spacing, components, page composition, anti-patterns. **Not** backend architecture. **Not** a paste of the stack playbook.
+
+```
+docs/design/
+├── README.md                  # index — when to load; links to system doc(s)
+└── <system-name>.md           # one art-direction file per agreed system (kebab-case)
+```
+
+Example: `docs/design/swiss-editorial.md` for a Swiss / International Typographic Style bulletin site.
+
+### Playbook vs product design
+
+| Layer | Where | What it covers |
+|---|---|---|
+| Stack playbook | `nextjs-frontend/01-design.md` (or the frontend stack's `01-design`) | Five UI questions, loading/empty/error states, anti-slop, accessibility baseline |
+| Product | `docs/design/<system-name>.md` | Art direction for **this** site — type scale, grid, palette, component character, editorial tone |
+
+MUST: load the stack `01-design` **and** the matching product design doc before layout, CSS tokens, or page composition.
+MUST: on composition, typography, and visual character, **the product doc wins** over generic SaaS/blog templates in the playbook.
+MUST NOT: put product art direction only in `docs/plan/frontend/v*.md` — the plan is slices; design is the living system spec.
+MUST NOT: duplicate the playbook's four UI states in prose here — link the stack file; this folder is what makes the product visually distinct.
+
+### README.md (index)
+
+Short index only:
+
+- What the design system is for (which site / surface)
+- Table linking each `<system-name>.md` and its purpose
+- **When:** any frontend UI work (layout shell, CSS tokens, page composition)
+- One line on playbook relationship (stack `01-design` for states; this folder for art direction)
+
+MUST NOT: paste the full system into README — detail lives in the named file.
+
+### `<system-name>.md` (art direction)
+
+Create when frontend UI is in scope and the team has agreed a direction — usually before the first layout/CSS slice, not on day one of a backend-only repo.
+
+Typical sections (filled when true, not as empty stubs):
+
+- Scope — which app / routes / locales
+- Product mapping — design terms → product nouns (categories, locales, platform tone)
+- Core philosophy — editorial character, what to avoid
+- Grid and breakpoints
+- Typography — family, scale, weights
+- Color and contrast
+- Spacing and rhythm
+- Components — nav, cards, article layout, metadata, forms (if any)
+- Page patterns — home, list, detail, 404
+- Anti-patterns — explicit rejects (e.g. SaaS dashboard, gradient hero)
+- Relationship to API — which public fields drive which UI (link `docs/architecture/api.md`)
+
+MUST: name real product mappings (locales, category slugs, domain) where they affect layout or copy.
+MUST: update when shipped UI diverges — same change set as the frontend code ([*Same change set*](#same-change-set)).
+MUST NOT: secrets, production URLs with credentials, or customer content as "examples".
+
+WHEN: a second visual system is agreed (e.g. admin panel vs public site).
+HOW: add another `<system-name>.md` and link it from `README.md`. MUST NOT: one file that mixes two unrelated surfaces without a heading that says which is which.
 
 ---
 
@@ -432,8 +537,10 @@ WHEN: a version ships, or handover starts.
 HOW: read and, if they drifted, update in the same change set:
 
 - `docs/architecture/overview.md` — components, data flow, integrations in use **today**
-- `docs/data-model.md` — nouns and relationships that exist
-- `docs/api.md` — URLs and payloads the client actually gets
+- `docs/architecture/data-model.md` — nouns and relationships that exist
+- `docs/architecture/api.md` — URLs and payloads the client actually gets
+- `docs/plan/` — version checklists match what shipped in each version
+- `docs/design/` — if a public frontend shipped, art direction matches what users see
 - `docs/security.md` — if identity or personal data is in play
 
 MUST: a sentence that is only true of the first design is removed or marked historical (an ADR is the place for "we used to").
@@ -507,7 +614,7 @@ HOW: stop. Update the plan, or say it is out of scope.
 ## Reading them
 
 WHEN: [05-understand.md](05-understand.md) fires and `docs/` exists.
-HOW: read the **one** file that matches the change — overview for system shape, data-model for a noun, api.md for a URL, the ADR if a past choice is in play, security.md for authz/retention, `CHANGELOG.md` for a ship, `docs/known-issues.md` for leftover work, `docs/operations/runbook.md` / `slo.md` / `deployment.md` for production, `docs/handover.md` when ownership is moving. Not the whole tree.
+HOW: read the **one** file that matches the change — overview for system shape, data-model for a noun, `architecture/api.md` for a URL, the matching `docs/plan/{backend,frontend}/v*.md` for version scope, `docs/design/README.md` and the linked `<system-name>.md` for frontend layout/CSS/tokens, the ADR if a past choice is in play, security.md for authz/retention, `CHANGELOG.md` for a ship, `docs/known-issues.md` for leftover work, `docs/operations/runbook.md` / `slo.md` / `deployment.md` for production, `docs/handover.md` when ownership is moving. Not the whole tree.
 MUST NOT: load this playbook file (09) unless you are creating or updating those docs, or the code change requires it (WHEN at the top).
 
 ---

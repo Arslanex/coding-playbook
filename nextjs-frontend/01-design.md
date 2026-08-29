@@ -2,7 +2,7 @@
 
 WHEN: any screen, layout, colour, type, spacing, icon, empty/loading/error state, or generating UI.
 LOAD: this file first on this stack. Where the file lives: [03-file-structure.md](03-file-structure.md). Tokens: [11-ui.md](11-ui.md).
-RELATED: 06 (metadata) · 15 (focus, names, XSS) — open only if the task is also that topic.
+RELATED: 06 (metadata) · 15 (focus, names, XSS) — open only if the task is also that topic · product art direction in `docs/design/` when it exists ([agents/09-docs.md](../../agents/09-docs.md) *docs/design/*) — wins on composition and typography.
 SCOPE: how a human reads and acts. Not React trees. Not a brand book for one company.
 
 A screen that looks "modern" and cannot be used is a defect. Decoration after the five questions below are answered.

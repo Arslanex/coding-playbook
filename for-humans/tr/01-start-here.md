@@ -39,22 +39,29 @@ Bu klasör **uygulama kaynak kodu değildir**. Tümünü `src/` içine kopyalama
 
 Bu playbook kurallardır. **Uygulama reposunun** kendi README'si ve `docs/` klasörü hâlâ gerekir — sonraki kişinin (ve sonraki ajanın) *sizin* ürününüz hakkında okuduğu yer orasıdır.
 
-Mimari sorulardan sonra ilk gün: `docs/data-model.md` ve `docs/architecture/overview.md`. Ağacın geri kalanı o şekil var olduğunda yazılır, boş şablon olarak değil. Ajanlar [`agents/09-docs.md`](../../agents/09-docs.md) dosyasına uyar. Görev notları sohbette değil, git-ignore edilen `.agent/plan.md` içindedir.
+Mimari sorulardan sonra ilk gün: `docs/architecture/data-model.md` ve `docs/architecture/overview.md`. Sürüm yol haritası: `docs/plan/backend/v1.md` ve `docs/plan/frontend/v1.md` (yığın başına checkbox dilimleri). Frontend görsel yönü: `docs/design/` (indeks + adlandırılmış sistem dosyası — örn. `swiss-editorial.md`). Ağacın geri kalanı o şekil var olduğunda yazılır, boş şablon olarak değil. Ajanlar [`agents/09-docs.md`](../../agents/09-docs.md) dosyasına uyar. Görev notları sohbette değil, git-ignore edilen `.agent/plan.md` içindedir.
 
 ```
 repo/
 ├── README.md                          # indeks, teknik doküman değil
 ├── CHANGELOG.md                       # ne çıktı, kullanıcı için
 └── docs/
-    ├── data-model.md                  # isimler → ER / validasyon büyür
-    ├── api.md                         # herkese açık HTTP sözleşmesi varken
     ├── security.md                    # kimlik veya kişisel veri varken
     ├── known-issues.md                # ilk yayın veya teslim — ne bitmedi
     ├── handover.md                    # başka ekip ürünü alırken
     ├── lessons-learned.md             # proje veya faz kapanırken
     ├── architecture/
     │   ├── overview.md                # sistem *şu an* nasıl çalışıyor
+    │   ├── data-model.md              # isimler → ER / validasyon büyür
+    │   ├── api.md                     # herkese açık HTTP sözleşmesi varken
     │   └── decisions/                 # ADR: neden, ne değil
+    ├── plan/
+    │   ├── README.md                  # sürüm yol haritası indeksi
+    │   ├── backend/                   # v1.md, v2.md — checkbox dilimleri
+    │   └── frontend/
+    ├── design/
+    │   ├── README.md                  # indeks — ne zaman yüklenir; sistem dosyalarına link
+    │   └── <system-name>.md           # ürün görsel yönü (ör. swiss-editorial.md)
     ├── development/
     │   ├── setup.md
     │   ├── development-guide.md

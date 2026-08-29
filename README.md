@@ -57,7 +57,7 @@ Read coding-playbook/AGENTS.md and follow it.
 I want to build: <one or two sentences, plain language>
 
 Before writing any file, ask me the questions in agents/08-architecture.md
-and write docs/data-model.md and docs/architecture/overview.md for me to confirm.
+and write docs/architecture/data-model.md and docs/architecture/overview.md for me to confirm.
 ```
 
 **TR**
@@ -67,7 +67,7 @@ coding-playbook/AGENTS.md dosyasını oku ve ona uy.
 Şunu yapmak istiyorum: <bir iki cümle, düz dille>
 
 Herhangi bir dosya yazmadan önce agents/08-architecture.md içindeki soruları
-bana sor ve onaylamam için docs/data-model.md ile docs/architecture/overview.md yaz.
+bana sor ve onaylamam için docs/architecture/data-model.md ile docs/architecture/overview.md yaz.
 ```
 
 The agent should come back with **questions, not files**. If it starts writing code, it did not read the playbook.

@@ -39,22 +39,29 @@ It is **not** application source code. Do not copy the whole folder into `src/`.
 
 This playbook is rules. The **application repo** still needs its own README and `docs/` — that is what the next person (and the next agent) reads about *your* product.
 
-Day one, after the architecture questions: `docs/data-model.md` and `docs/architecture/overview.md`. The rest of the tree is created when that shape exists, not as empty stubs. Agents follow [`agents/09-docs.md`](../../agents/09-docs.md). Task notes live in `.agent/plan.md` (git-ignored), not in chat.
+Day one, after the architecture questions: `docs/architecture/data-model.md` and `docs/architecture/overview.md`. Version roadmap: `docs/plan/backend/v1.md` and `docs/plan/frontend/v1.md` (checkbox slices per stack). Frontend art direction: `docs/design/` (index + named system file — e.g. `swiss-editorial.md`). The rest of the tree is created when that shape exists, not as empty stubs. Agents follow [`agents/09-docs.md`](../../agents/09-docs.md). Task notes live in `.agent/plan.md` (git-ignored), not in chat.
 
 ```
 repo/
 ├── README.md                          # index, not the technical document
 ├── CHANGELOG.md                       # what shipped, for users
 └── docs/
-    ├── data-model.md                  # nouns → grows ER / validation
-    ├── api.md                         # when a public HTTP contract exists
     ├── security.md                    # when auth or personal data exists
     ├── known-issues.md                # first ship or handover — what is unfinished
     ├── handover.md                    # when another team takes the product
     ├── lessons-learned.md             # when a project or phase closes
     ├── architecture/
     │   ├── overview.md                # how the system works *now*
+    │   ├── data-model.md              # nouns → grows ER / validation
+    │   ├── api.md                     # when a public HTTP contract exists
     │   └── decisions/                 # ADRs: why, not what
+    ├── plan/
+    │   ├── README.md                  # version roadmap index
+    │   ├── backend/                   # v1.md, v2.md — checkbox slices
+    │   └── frontend/
+    ├── design/
+    │   ├── README.md                  # index — when to load; links to system doc(s)
+    │   └── <system-name>.md           # product art direction (e.g. swiss-editorial.md)
     ├── development/
     │   ├── setup.md
     │   ├── development-guide.md

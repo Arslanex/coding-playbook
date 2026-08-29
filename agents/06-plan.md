@@ -26,7 +26,7 @@ MUST NOT: a plan for a one-line fix. A ritual that adds nothing is a ritual agen
 
 Default: `.agent/plan.md` in the **product** repo, git-ignored.
 
-It is a file because a file survives the turn, can be re-read, and can be checked. It is git-ignored because it is scaffolding, not history — the decisions worth keeping end up in the product docs / ADRs ([09-docs.md](09-docs.md)), in the playbook, and in commit messages.
+It is a file because a file survives the turn, can be re-read, and can be checked. It is git-ignored because it is scaffolding, not history — the decisions worth keeping end up in the product docs / ADRs ([09-docs.md](09-docs.md)), version checklists in `docs/plan/`, and in commit messages.
 
 MUST NOT: the plan in the chat. That is the thing this file exists to prevent.
 MUST NOT: the plan inside `coding-playbook/`. The playbook is rules; the plan is this task.
