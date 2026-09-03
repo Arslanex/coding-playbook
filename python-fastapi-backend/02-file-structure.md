@@ -101,6 +101,46 @@ MUST NOT: open `shared/` because two modules need it. Owner + call the service: 
 
 ---
 
+## Folder or prefix
+
+*Decide* says which folder a unit belongs in. This says whether the thing you
+are about to create should be a folder at all.
+
+A folder is a **claim**: everything inside belongs together, and nothing outside
+needs to reach in. `infra/db/repositories/` earns it — twelve files, one per
+table, and nothing outside `infra/` imports one. A folder whose claim is false
+is worse than the flat list it replaced, because a flat list makes no claim at
+all: the next agent reads `posts/admin/`, concludes that admin's things live
+there, finds `admin_schemas.py` sitting at the root instead, and stops trusting
+the tree — including the folders that were telling the truth.
+
+Two tests, both before it exists.
+
+**1. Naming and nesting are substitutes.** `admin_router.py` and
+`admin/router.py` carry the same information. The prefix is free; the folder
+costs a traversal, a longer import path, and a "where does this go?" question
+on every file added afterwards. Use the prefix until the flat list is genuinely
+hard to scan — in practice around **five files that nothing outside the group
+imports**. Below that, a folder is a directory you open to find two files.
+
+MUST: count what is **shared** before folding by category. If most of the lines
+belong to more than one of the groups, the groups are labels rather than
+structure, and labels are what prefixes are for. `modules/posts/` reached ten
+files across three audiences with 63% of its lines used by more than one of
+them; the remainder would have made two folders of two files and one of one,
+while the two largest files — half the module — stayed at the root regardless.
+
+**2. Depth follows dependency, not category.** `infra/db/repositories/` narrows
+at every level: infra, then the database, then row access. Each step is a real
+restriction on what may be inside, and that is what makes the level worth
+walking. A category folder restricts nothing; it sorts. **If you cannot say what
+the level forbids, it is a prefix.**
+
+MUST NOT: a folder to make `ls` shorter. A long `ls` is the flat list working —
+it is showing you everything, which is the property you lose by nesting.
+
+---
+
 ## Root files
 
 Four files at `backend/`, no more. A new dotfile at the root needs a reason a reviewer would accept.
@@ -287,6 +327,7 @@ MUST NOT: `http/` import a module service except the mount list importing the ro
 
 ## Done
 
+- [ ] Every folder's claim is true: nothing outside it reaches in, and it holds more than a couple of files
 - [ ] Decide first-yes matches the path
 - [ ] Folder "Is" still true; "Put elsewhere" was not ignored
 - [ ] No `utils/` / `helpers/` / `common/`
