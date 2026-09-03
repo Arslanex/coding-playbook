@@ -95,7 +95,11 @@ MUST NOT: `User` as the only copy of the account. MUST NOT: permissions as the o
 
 Key: `{capability}:{purpose}:{id}` from the owning module, TTL explicit. MUST NOT: `infra/cache` invent `order:cancelled`.
 
-`http/` may call `infra/` for rate-limit, idempotency, and identity verification (the `jti` denylist, and whether the account is still active). `infra/cache/` holds the reconstructible ones. A revocation list is not reconstructible — losing it un-revokes every token that was logged out — so it belongs beside the session rows in `infra/db/`, as *Done* below already says. Still MUST NOT: `infra/cache` import a module. MUST NOT: `http/` reach any of these through a module service — verification has no product sentence, so it has no business being a method on one (10).
+`http/` may call `infra/` for rate-limit, idempotency, and identity verification (the `jti` denylist, and whether the account is still active). **Which store backs each one is decided here, not in 10** — that page rules on layering and names no store, deliberately.
+
+MUST: `infra/cache/` only for state that can be rebuilt after it is lost. MUST: `infra/db/` for state whose loss changes an answer. A revocation list is the second kind — lose it and every token that was logged out silently works again — so it sits beside the session rows, as *Done* below says. Rate-limit windows and idempotency keys are the first kind and may live in cache.
+
+Still MUST NOT: `infra/cache` import a module. MUST NOT: `http/` reach any of these through a module service — verification has no product sentence, so it has no business being a method on one (10).
 
 ---
 

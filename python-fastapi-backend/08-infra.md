@@ -109,7 +109,7 @@ workers/jobs/          →  infra/queue/        (consume only)
 ```
 
 MUST NOT: infra import a module.
-MUST NOT: `http/` import infra except `http/deps` opening `infra/db/session.py`, and `http/` reads for rate-limit, idempotency, and identity verification — the `jti` denylist and whether the account is still active (10, [13-identity-security.md](13-identity-security.md)). Those reach `infra/` whichever store backs them; a durable revocation list is not a reason to route the read through a module service instead. MUST NOT: `http/` read any of them through `modules/*/service.py`. A narrow identity reader is not `infra/db/repositories/` and does not become importable by the rest of `http/`: it answers identity questions and nothing else, which is the difference from generic row access.
+MUST NOT: `http/` import infra except `http/deps` opening `infra/db/session.py`, and `http/` reads for rate-limit, idempotency, and identity verification — the `jti` denylist and whether the account is still active (10, [13-identity-security.md](13-identity-security.md)). Those reach `infra/` whichever store backs them — which store is a durability question, answered in [13](13-identity-security.md), and it does not change what `http/` may import. MUST NOT: `http/` read any of them through `modules/*/service.py`. A narrow identity reader is not `infra/db/repositories/` and does not become importable by the rest of `http/`: it answers identity questions and nothing else, which is the difference from generic row access.
 MUST NOT: infra/db repository import cache/queue/storage.
 
 Failures talking to a vendor: raise `ServiceUnavailableError` (05). MUST NOT: leak vendor error bodies to the client.

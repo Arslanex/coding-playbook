@@ -126,9 +126,11 @@ Is: who is calling, and which DB session. Not named `auth`.
 
 `get_current_user` — Bearer JWT (secret from `config/`) → `user_id` (and a small `CurrentUser` if more claims are required). Bind `user_id` on log context (04). MUST NOT: login, password, refresh, signup — `modules/auth/`. MUST NOT: `OrderService`. MUST NOT: `HTTPException` with a custom body — raise `AuthenticationError` / `AuthorizationError` (05) and let `http/errors/` map.
 
-Day one: claims from the token are enough. MUST NOT: `UserRepository` "just in case". If a later requirement is "reject revoked sessions", the lookup is still this dep (identity), not `AuthService.login`. **Identity store → `infra/`**, and which folder follows the state, not the habit: `infra/cache/` when it is reconstructible, `infra/db/` when losing it changes an answer. A revocation list is the second kind — drop it and every token that was logged out silently works again — which is why *Done* in [13](13-identity-security.md) puts the session and refresh rows in Postgres and leaves Redis only reconstructible bytes.
+Day one: claims from the token are enough. MUST NOT: `UserRepository` "just in case". If a later requirement is "reject revoked sessions", the lookup is still this dep (identity), not `AuthService.login`. **The dep does that read itself, through `infra/`.** MUST NOT: reach a module service to do it.
 
-The dep does that read itself, through `infra/`, whichever store backs it. MUST NOT: reach a module service to do it. **Still no product sentence** — that is the whole test here, and it is what decides the question, not where the bytes happen to live. "Is this token revoked, is this account still active" names no product noun; "who may be invited, what a password must look like, when a refresh rotates" does, and stays in `modules/auth/`.
+**Still no product sentence** — that is the test, and it is the only one this page applies. "Is this token revoked, is this account still active" names no product noun; "who may be invited, what a password must look like, when a refresh rotates" does, and stays in `modules/auth/`.
+
+Which store backs that read is a **durability** question, answered in [13](13-identity-security.md). It changes nothing here. This line used to name one store, and that is precisely what broke: a product that made its revocation list durable — as 13 tells it to — then had no sanctioned way to read it from `http/`, because the only door left was a module service this page forbids. A layering rule that answers with a storage location stops answering the moment the storage changes.
 
 Public routes omit `get_current_user`. They may still take `get_session` if they write.
 
