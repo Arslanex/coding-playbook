@@ -66,21 +66,19 @@ WHERE it lives: the module that owns the meaning; a read-repository's DTO stays 
 
 ## File: when to split
 
-Do not split because a topic exists. Split because the file can no longer be edited safely.
+Do not split because a topic exists. Do not split because a file is long. Split
+because the file can no longer be edited safely.
 
-SHOULD: keep a file under 300 lines **of code**.
-MUST: split before 500 lines **of code**.
+**There is no line count here, deliberately.** One was tried and it failed in
+both directions. It fired falsely: this page requires a docstring with `Args`,
+`Returns` and `Raises` on every public function, so a service crossed the
+threshold *because* it was documented — 691 lines of which 303 were code — and
+the split it demanded would have cut a coherent file in half to satisfy
+arithmetic. And it stayed silent when it mattered: a file under any threshold
+can still hold two reasons to change, and a number tells you it is fine.
 
-Lines of code, not lines in the file: docstrings, comments and blank lines do
-not count. This page requires a docstring with `Args`, `Returns` and `Raises` on
-every public function, so counting those against the budget makes a file split
-*because* it is well documented — the opposite of the line above it. A 690-line
-file that is 300 lines of code and 260 of docstring is not harder to edit
-safely; it is easier, which is the only thing the number is a proxy for.
-
-The number is a shortcut for the four triggers below, not a rule of its own.
-Near it, read them instead of counting — and if none of them fires, the file is
-fine and the count was measuring the wrong thing.
+A count is easy to check, which is exactly why it gets checked instead of the
+thing it stands for. The triggers below are the rule. Read them.
 
 MUST split when any of these is true:
 
@@ -88,6 +86,8 @@ MUST split when any of these is true:
 - the next agent cannot see the public surface without scrolling past helpers
 - tests for one behavior require importing unrelated helpers
 - a second `*Service` class appeared — that is a new package, or a helper that is not a Service
+
+If none of them is true, the file is the right size whatever its length.
 
 MUST: after a split, each file still has one capability in its header `Purpose`.
 MUST NOT: split by dumping leftovers into `utils.py` / `helpers.py` / `common.py`.
