@@ -95,7 +95,7 @@ MUST NOT: `User` as the only copy of the account. MUST NOT: permissions as the o
 
 Key: `{capability}:{purpose}:{id}` from the owning module, TTL explicit. MUST NOT: `infra/cache` invent `order:cancelled`.
 
-`http/` may call `infra/cache` for rate-limit, idempotency, and `jti` denylist. Still MUST NOT: `infra/cache` import a module.
+`http/` may call `infra/` for rate-limit, idempotency, and identity verification (the `jti` denylist, and whether the account is still active). `infra/cache/` holds the reconstructible ones. A revocation list is not reconstructible — losing it un-revokes every token that was logged out — so it belongs beside the session rows in `infra/db/`, as *Done* below already says. Still MUST NOT: `infra/cache` import a module. MUST NOT: `http/` reach any of these through a module service — verification has no product sentence, so it has no business being a method on one (10).
 
 ---
 
@@ -150,6 +150,7 @@ Everything else on a protected route — rate limit, CORS, parameterised SQL, re
 ## Done
 
 - [ ] Login/issue/revoke in `modules/auth/`; `http/deps` only verifies
+- [ ] The verify path reads `infra/`, not a module service — signing is a product act, verifying is a lookup
 - [ ] `User` + session/refresh row in Postgres; Redis holds only reconstructible bytes
 - [ ] Access JWT is short, claims are `sub`/`exp`/`jti` — not a permission dump
 - [ ] Resource authz is the owning service (404); staff verbs need tables before `require_permission`
