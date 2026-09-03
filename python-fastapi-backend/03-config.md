@@ -4,6 +4,7 @@ WHEN: reading an env var, adding a limit / timeout / pool size, a secret, or a f
 LOAD: this file only.
 RELATED: 02 (where `config/` sits) · 15 (secret handling) · 16 (which numbers must be capped) — open only if the task is also that topic.
 SCOPE: `src/config/`. Every other file in this playbook says "from `config/`". This file says what that means.
+ADAPTED (GİRVAK, vidinsight-blog-service): env names use a **single** underscore — `SECURITY_JWT_SECRET`, not `SECURITY__JWT_SECRET` — because the double one reads as a typo to everyone who edits the deploy file. `env_nested_delimiter` cannot express that (a single `_` splits on *every* underscore, so `SECURITY_JWT_ACCESS_TTL_SECONDS` would parse as five levels), so each group is its own `BaseSettings` with an `env_prefix`. `settings.security.jwt_secret` is unchanged in code. The cost and its replacement are in *Shape* below.
 
 One typed settings object per process. Built once at startup. Read everywhere by injection, never by `os.getenv`.
 
@@ -55,6 +56,8 @@ class Settings(BaseSettings):
 ```
 
 MUST: `extra="forbid"` — a typo in a deploy variable fails the boot instead of silently using a default.
+
+ADAPTED (GİRVAK): with `env_prefix` groups, `extra="forbid"` cannot sit on the outer model — every `SECURITY_*` key belongs to a group that reads it itself and looks extra to the parent. The protection is not dropped: a `model_validator` scans `.env` and refuses to start on any key that is neither a setting nor a documented exception (`SEED_*`, `SYNC_*`, `DATABASE_URL`, `FORWARDED_ALLOW_IPS`, `RUN_DB_TESTS`). Checking only prefixed keys was tried first and passed `SECURTIY_JWT_SECRET`, where the misspelling is in the prefix — which is the mistake most worth catching. Only `.env` is scanned, never the whole environment: a container carries plenty that is not ours. Pinned by `tests/config/test_settings_env_names.py`.
 MUST: `frozen=True` — nothing mutates settings at runtime. A value that must change while the process runs is a feature flag store, not this object.
 MUST: every field typed. `Literal` for a closed set, `int` for a count, `timedelta` / `float` seconds for a duration — pick one duration style and keep it. MUST NOT: `str` for a number.
 
@@ -69,6 +72,8 @@ class DatabaseSettings(BaseModel):
 ```
 
 Env name = the path, upper-cased, joined by the delimiter: `DATABASE__POOL_SIZE`, `SECURITY__JWT_SECRET`.
+
+ADAPTED (GİRVAK): one underscore — `DATABASE_POOL_SIZE`, `SECURITY_JWT_SECRET`. Each group is a `BaseSettings` with `model_config = SettingsConfigDict(env_file=".env", extra="ignore", env_prefix="SECURITY_")`, and `Settings` composes them with `Field(default_factory=...)`. Same object path in code, one underscore in the file.
 
 ---
 

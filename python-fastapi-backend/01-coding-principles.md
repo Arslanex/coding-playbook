@@ -89,6 +89,8 @@ MUST NOT: split by adding a second `*Service` in the same package. Helpers are n
 MUST: first bytes of every `.py` file. Nothing above it.
 Audience: the next agent choosing a file. After this block they know edit-here vs open-another.
 
+ADAPTED (GİRVAK, vidinsight-blog-service): the header is written as **prose**, not this field block — `"""Layer: <one word>. <what this file is for>.` then a `Called by:` / `Calls:` line, then a paragraph saying why the file exists at all. It carries four of the six fields below (`Layer`, `Purpose`, `Called by`, `Calls`) and adds the reason, which the template does not ask for and which is the thing a later agent actually needs before deciding to edit here. `Module:` is dropped: it restates the path of the file the reader has already opened, and 88 of them is 88 lines that go stale on a rename. `Dependencies:` is kept where a file takes injected types. The audience argument above is unchanged and is the reason the prose form must still open with `Layer:` and still name concrete files. Pinned by `tests/test_docstrings.py::test_every_file_has_a_header`.
+
 ```python
 """
 Module: orders/service.py

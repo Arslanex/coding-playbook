@@ -15,6 +15,7 @@ English, snake_case, the noun: `orders`, `auth`, `billing`.
 
 MUST: folder = resource after the version (`/v1/orders` → `orders`).
 MUST NOT: `v1`, `api`, `handlers`, `core`, `orders_service`, a verb (`cancel`).
+ADAPTED (GİRVAK, vidinsight-blog-service): this API segments its URLs by **audience**, not by resource — `/v1/public/posts`, `/v1/admin/posts`, `/v1/ingest/posts` — because the three surfaces have different credentials *and* different network exposure, and the edge proxy enforces the difference by path (only `/v1/ingest/*` is published; the site reaches the other two privately). Resource-first URLs would leave nginx nothing to match on. So the segment after the version is an audience, and **the folder still follows the noun, not that segment**: `modules/posts/` owns all three. The audience becomes a router file inside it — see the *Second router file* adaptation below. `modules/public/`, `modules/admin/` and `modules/ingest/` all existed here first and each one collected exactly the coupling this page forbids: they held HTTP for nouns they did not own, so their `schemas.py` became the file every other module imported, and `categories/` was left as a lone `service.py` with its two routes and its response shape living in two other modules. `ingest` was additionally a verb. Pinned by `tests/test_module_boundaries.py`.
 
 New folder only if **deleting it removes a user-visible ability**. Same noun, extra behavior → file in the existing package (01), not a new folder.
 
@@ -52,6 +53,25 @@ Owner: whose tests break if this rule is deleted? That package owns the file.
 MUST NOT: `utils/`, `helpers/`, `common/`, `modules/common/`, `modules/shared/`, `modules/core/`.
 MUST NOT: move a helper into `shared/` because a second caller appeared — add a service method, and a DTO if needed.
 
+ADAPTED (GİRVAK, vidinsight-blog-service): one exception to #4, and only under
+all three conditions — an **input-validation rule with no product noun**, needed
+by **two or more modules' `schemas.py`**, where the service-call answer is
+structurally impossible. A Pydantic field validator has no session and cannot
+call another module's service, and *Kinds* forbids `schemas.py` importing
+another module at all, so #4 has no reachable form. Such a rule stays in
+`shared/` as a named policy file.
+
+The one instance is `shared/url_policy.py` — an http(s) scheme allowlist for any
+stored URL that will land in an `href`/`src`, used by `posts` and `authors`
+schemas. It names no product noun, and copying it into both modules is what
+#4 forbids anyway.
+
+MUST NOT: read this as re-opening `shared/`. Everything with a product noun
+still leaves: `slugify`, `tag_policy`, `markdown_policy`, `search_pattern` and
+`author_social` all moved to their owners, and `tag_policy` moved **behind
+`TagService`** because `posts` needed it at service time, where a service call
+does work.
+
 ---
 
 ## Files (`orders`)
@@ -82,6 +102,7 @@ Add a file only when its trigger is true. Do not scaffold the list.
 - `<work>.py` (`totals.py`, `render.py`, `policy.py`) — `service.py` failed 01. Not because "orders have totals". Not because a second URL exists.
 - `deps.py` — constructor needs Redis, queue, or extra sessions. Until then: factory in `router.py`.
 - Second router file — `router.py` itself failed 01. MUST NOT: `routes/`, `api/`.
+  - ADAPTED (GİRVAK): also when the module serves more than one **audience**. An `APIRouter` carries one prefix, and the URL adaptation above gives one prefix per audience, so `modules/posts/` has `router.py` (`/v1/admin/posts`, editor JWT), `public_router.py` (`/v1/public/…`, no credentials, published rows only) and `ingest_router.py` (`/v1/ingest/posts`, service key). This is not the 01 size split and must not be used as a substitute for it: the test is that the files answer to **different permissions**. Merging them would put every reader-facing change in the file that grants admin access. `schemas.py` splits the same way and for the same reason — `posts/schemas.py` is the admin contract, `posts/public_schemas.py` the reader one — which is what lets the admin shape gain a field without it reaching the public API.
 
 MUST NOT in this folder, ever:
 

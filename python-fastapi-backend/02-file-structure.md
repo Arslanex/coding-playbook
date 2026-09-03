@@ -85,6 +85,18 @@ Product noun = `orders`, `auth`, `billing`. Not `service`, `api`, `util`.
    → `tests/` mirroring `src/` (drop the `src/` segment). Details: [14-testing.md](14-testing.md).
 
 No yes: not a new top-level folder. Put a helper file inside the existing `modules/<capability>/` (01: when to split).
+
+ADAPTED (GİRVAK, vidinsight-blog-service): one more leaf, `src/<package>/scripts/`, for a **hand-run or cron-run CLI**. Decide has no yes for one: #4 sends a background process to `workers/`, and [11-workers.md](11-workers.md) says not to create `workers/` until a queue exists — this product has none, and scaffolding a broker to host two maintenance commands would be the speculative structure 11 is guarding against.
+
+What may live there is narrow, and the folder is only defensible while it holds:
+
+- reading `config/` (never `os.getenv` — 03 applies here exactly as everywhere else)
+- calling **one** module service
+- printing the result and exiting non-zero on a typed error
+
+MUST NOT: business rules, vendor I/O, SQL, or an import of anything but a service and `config/`. `sync_external_posts.py` used to hold all four; the HTTP and feed parsing went to `infra/syndication/` (08), the product decisions to `modules/syndication/` (09), and what remained was thirty lines of argument-free CLI. If a script grows past that shape again, the growth belongs in a module, not here.
+
+WHEN: a queue is added. HOW: the cron-run import becomes a job (11) and this leaf keeps only the genuinely interactive commands.
 MUST NOT: open `shared/` because two modules need it. Owner + call the service: [09-modules.md](09-modules.md) (Used by more than one module). If only one module uses it, it stays there.
 
 ---

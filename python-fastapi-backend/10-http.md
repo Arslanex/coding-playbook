@@ -107,6 +107,8 @@ Order in `main.py` (outside → inside):
 
 1. `request_id` (context exists before anything logs)
 2. CORS — unless an edge fronts every browser call and owns the origin list ([Extra 02](extra/02-microservices.md)). One place, never two.
+
+ADAPTED (GİRVAK, vidinsight-blog-service): CORS is **outermost**, above `request_id`. A response built by a middleware never reaches the layers outside it, so with CORS inside, the rate limiter's own 429 carried no `Access-Control-Allow-Origin` and a browser reported a bare network error instead of the status it was sent. `request_id` still binds before anything that logs — CORS logs nothing — so the reason behind rule 1 holds. Note this only matters while `CORS_ALLOWED_ORIGINS` is non-empty; in this product it is empty by default, because no browser calls the API (the panel goes through the site's same-origin proxy).
 3. metrics
 4. rate_limit
 5. idempotency (if present)

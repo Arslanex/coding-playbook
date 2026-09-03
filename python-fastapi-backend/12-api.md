@@ -12,6 +12,7 @@ The raise site never builds HTTP. The router never catches to invent a body. One
 ## URL
 
 MUST: `/v1/<resources>` — version in the path, not a header. Resource plural, kebab-case (`/v1/orders`, `/v1/stage-assignments`).
+ADAPTED (GİRVAK, vidinsight-blog-service): `/v1/<audience>/<resources>` — `/v1/public/posts`, `/v1/admin/posts`, `/v1/ingest/posts`. The reason and the folder consequence are in [09](09-modules.md#package-name); the short version is that the edge proxy decides what is reachable from the internet by path, and one resource here has three callers with three credentials. The rest of this rule holds: plural, kebab-case, no verb as a collection.
 MUST NOT: `/api/v1`. MUST NOT: `http/v1/` folder (09, 10).
 MUST NOT: a verb as a collection (`/cancel`). Action that is not CRUD = sub-resource `POST /v1/orders/{id}/cancel`.
 
