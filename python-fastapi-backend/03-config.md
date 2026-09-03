@@ -28,7 +28,7 @@ src/config/
   settings.py      # class Settings + nested groups
 ```
 
-Day one that is enough. Split (01) only when `settings.py` passes 300 lines — then one file per group (`database.py`, `security.py`) and `settings.py` composes them. MUST NOT: `config/base.py` + `config/dev.py` + `config/prod.py` as three classes. One class; the **environment** supplies different values.
+Day one that is enough. Split (01) only when one of 01's triggers fires — in practice, when the groups start having separate reasons to change — then one file per group (`database.py`, `security.py`) and `settings.py` composes them. MUST NOT: split on length; a settings file is long because the product has settings. MUST NOT: `config/base.py` + `config/dev.py` + `config/prod.py` as three classes. One class; the **environment** supplies different values.
 
 MUST NOT: `config/constants.py` for business numbers ("an order may hold 50 items"). That is a product rule — `modules/` (09). `config/` holds operational numbers, not policy.
 

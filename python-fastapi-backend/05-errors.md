@@ -27,7 +27,7 @@ Workers use the same types. They do not map to HTTP. The runner logs with `Logge
 
 ## Folder vs file
 
-`shared/` and `http/` already have an `errors/` **folder** in the tree (02). That folder is the package. Inside it, start with **files**. Do not nest another folder until 01 split rules fire (two reasons to change, or >300 lines).
+`shared/` and `http/` already have an `errors/` **folder** in the tree (02). That folder is the package. Inside it, start with **files**. Do not nest another folder until 01's split triggers fire — two reasons to change, or the public surface buried under helpers. Not because the file got long.
 
 `shared/errors/`
 - Holds: `AppBaseError` and the status-class parents (`NotFoundError`, `AuthenticationError`, `AuthorizationError`, `ValidationError`, `ConflictError`, `RateLimitError`, `ServiceUnavailableError`).
