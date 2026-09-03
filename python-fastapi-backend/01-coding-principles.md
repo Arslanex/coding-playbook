@@ -68,8 +68,19 @@ WHERE it lives: the module that owns the meaning; a read-repository's DTO stays 
 
 Do not split because a topic exists. Split because the file can no longer be edited safely.
 
-SHOULD: keep a file under 300 lines.
-MUST: split before 500 lines.
+SHOULD: keep a file under 300 lines **of code**.
+MUST: split before 500 lines **of code**.
+
+Lines of code, not lines in the file: docstrings, comments and blank lines do
+not count. This page requires a docstring with `Args`, `Returns` and `Raises` on
+every public function, so counting those against the budget makes a file split
+*because* it is well documented — the opposite of the line above it. A 690-line
+file that is 300 lines of code and 260 of docstring is not harder to edit
+safely; it is easier, which is the only thing the number is a proxy for.
+
+The number is a shortcut for the four triggers below, not a rule of its own.
+Near it, read them instead of counting — and if none of them fires, the file is
+fine and the count was measuring the wrong thing.
 
 MUST split when any of these is true:
 
