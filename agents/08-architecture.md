@@ -103,7 +103,7 @@ WHEN: the documents exist and the first slice is agreed.
 HOW: this order. Each step exists because the next imports it — out of order means inventing a local version and unwinding it later.
 
 **0 · Skeleton** — what everything else assumes.
-WHERE: `pyproject.toml` + lockfile + pinned Python (02) · `config/` + `.env.example` (03) · `shared/errors/` (05) · `shared/logging/` (04) · `main.py` + `http/router.py` + `http/deps.py` (10) · `infra/db/session.py` (06) · Alembic wired, chain empty (07) · a test database and one passing test (14).
+WHERE: `pyproject.toml` + lockfile + pinned Python (02) · `config/` + `.env.example` (03) · `core/errors/` (05) · `core/logging/` (04) · `main.py` + `http/router.py` + `http/deps.py` (10) · `infra/db/session.py` (06) · Alembic wired, chain empty (07) · a test database and one passing test (14).
 MUST: one slice, not seven. It is boring and fast, and every later step is cheaper for it.
 MUST NOT: a business rule anywhere in step 0.
 MUST NOT: a `Dockerfile`, compose file, or CI workflow unless the user asked ([01-boundary.md](01-boundary.md)). If the test database needs a container the project lacks, give the command and stop.

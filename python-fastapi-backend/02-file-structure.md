@@ -25,7 +25,7 @@ backend/
 │   └── <package>/           # one root package. `src/http/` would shadow stdlib http
 │       ├── main.py
 │       ├── config/
-│       ├── shared/
+│       ├── core/
 │       │   ├── errors/
 │       │   └── logging/
 │       ├── http/
@@ -58,7 +58,7 @@ backend/
 # MUST NOT exist: utils/  helpers/  common/
 ```
 
-Helpers exist. A `utils/` folder does not. Named file in the owning module (`totals.py`), or `infra/` / `shared/` by Decide. Two callers: [09-modules.md](09-modules.md).
+Helpers exist. A `utils/` folder does not. Named file in the owning module (`totals.py`), or `infra/` / `core/` by Decide. Two callers: [09-modules.md](09-modules.md).
 
 ---
 
@@ -78,7 +78,7 @@ Product noun = `orders`, `auth`, `billing`. Not `service`, `api`, `util`.
 4. Background process that consumes a job payload?
    → `workers/jobs/`. Details: [11-workers.md](11-workers.md).
 5. Kernel primitive with no product noun (base exception class, logger wiring)?
-   → `shared/`
+   → `core/`
 6. Environment → typed settings?
    → `config/`. Details: [03-config.md](03-config.md).
 7. Test?
@@ -97,7 +97,7 @@ What may live there is narrow, and the folder is only defensible while it holds:
 MUST NOT: business rules, vendor I/O, SQL, or an import of anything but a service and `config/`. `sync_external_posts.py` used to hold all four; the HTTP and feed parsing went to `infra/syndication/` (08), the product decisions to `modules/syndication/` (09), and what remained was thirty lines of argument-free CLI. If a script grows past that shape again, the growth belongs in a module, not here.
 
 WHEN: a queue is added. HOW: the cron-run import becomes a job (11) and this leaf keeps only the genuinely interactive commands.
-MUST NOT: open `shared/` because two modules need it. Owner + call the service: [09-modules.md](09-modules.md) (Used by more than one module). If only one module uses it, it stays there.
+MUST NOT: open `core/` because two modules need it. Owner + call the service: [09-modules.md](09-modules.md) (Used by more than one module). If only one module uses it, it stays there.
 
 ---
 
@@ -233,17 +233,17 @@ Put here: nested settings fields (03) — `DATABASE__DSN`, `DATABASE__POOL_SIZE`
 Put elsewhere: business policy ("cancel only if unpaid") → `modules/`.
 MUST NOT: `os.getenv` / `os.environ` outside `config/` — not in `modules/`, `infra/`, `http/`, `workers/`, or `main.py` (03).
 
-### `src/shared/` — kernel, no product noun
+### `src/core/` — kernel, no product noun
 
 Is: code that would still exist if the product had zero features.
 
-`shared/errors/` — base exception types every feature error subclasses.
-`shared/logging/` — logger setup and log context. Not "log that an order cancelled".
+`core/errors/` — base exception types every feature error subclasses.
+`core/logging/` — logger setup and log context. Not "log that an order cancelled".
 
 Put here: a base class or logger adapter with no `orders` / `auth` in the name.
 
 Put elsewhere: `OrderNotCancellableError` → that module. HTTP status mapping → `http/errors/`.
-MUST NOT: grow `shared/` into a toolbox.
+MUST NOT: grow `core/` into a toolbox.
 
 ### `src/http/` — transport shell
 

@@ -28,7 +28,7 @@ Stop at the first yes.
 5. GraphQL schema, gRPC proto, "flexible query for the frontend"?
    → **do not add** until a client that cannot use `/v1` exists. See Other transports.
 
-MUST NOT: `shared/authz/`, `shared/jwt.py`, `infra/redis/`, `http/deps/auth.py` as the login product.
+MUST NOT: `core/authz/`, `core/jwt.py`, `infra/redis/`, `http/deps/auth.py` as the login product.
 
 ---
 

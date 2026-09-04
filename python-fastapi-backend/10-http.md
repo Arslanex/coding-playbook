@@ -20,7 +20,7 @@ Stop at the first yes.
 2. Login, password, refresh, "issue a token" as a product?
    → **not http** — `modules/auth/`. This layer only **reads** a Bearer token.
 3. Base exception class or logger pipeline?
-   → `shared/` (05, 04). This layer **maps** exceptions to JSON; it does not define `NotFoundError`.
+   → `core/` (05, 04). This layer **maps** exceptions to JSON; it does not define `NotFoundError`.
 4. Open/close the engine, Redis, queue — process lifetime?
    → `main.py` lifespan. This layer does not own pools.
 5. True for (almost) every request, and the file name has no product noun?
@@ -64,7 +64,7 @@ main.py
 workers/jobs/  →  modules/*/service.py         # skip http entirely (11)
 ```
 
-`http/` → may import: `shared/errors` (to catch parents), `shared/logging` (bind context, `LoggerName.API`), `infra/db/session.py` (open/close scope only), `config/` (CORS origins, JWT secret, rate limits).
+`http/` → may import: `core/errors` (to catch parents), `core/logging` (bind context, `LoggerName.API`), `infra/db/session.py` (open/close scope only), `config/` (CORS origins, JWT secret, rate limits).
 
 `http/` → MUST NOT import: `infra/db/models`, `infra/db/repositories`, `infra/queue`, `infra/storage`, any `modules/*/service.py`, any `modules/*/schemas.py`.
 
@@ -144,7 +144,7 @@ Split `deps/` into files only when 01 fires (session vs identity as two reasons 
 
 Is: exception → status + `{error_code, message, details}`. Registered from `main.py`. Four handlers (05). What the client sees: 12. Logger: `api` for expected 4xx, `error` for unhandled 5xx.
 
-MUST NOT: a second JSON shape. MUST NOT: a module `except OrderNotFoundError` to build a body. Exception classes belong to their module or `shared/errors` — 05 owns that rule.
+MUST NOT: a second JSON shape. MUST NOT: a module `except OrderNotFoundError` to build a body. Exception classes belong to their module or `core/errors` — 05 owns that rule.
 
 OpenAPI error component lives here, next to the handlers, until 01 split (05).
 
@@ -152,7 +152,7 @@ OpenAPI error component lives here, next to the handlers, until 01 split (05).
 
 ## Extra files
 
-`pagination.py` — two or more modules return a list page (`items` + `next_cursor` / `limit`). Until then the first list declares the envelope in that module's `schemas.py`. MUST NOT: `shared/pagination.py`.
+`pagination.py` — two or more modules return a list page (`items` + `next_cursor` / `limit`). Until then the first list declares the envelope in that module's `schemas.py`. MUST NOT: `core/pagination.py`.
 
 MUST NOT: `http/schemas/` (`OrderResponse`), `http/orders.py`, `http/services/`, `http/utils.py`.
 

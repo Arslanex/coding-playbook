@@ -38,7 +38,7 @@ Package, `OrderService`, `orders` table: unversioned. Only the path and `schemas
 1. Table, SQL, or vendor client (vendor gone → no product sentence left)?
    → `infra/` (06, 08). Many services may **read** the same repo. **Write** = one owning service.
 2. Base exception or logger pipeline (exists with zero features)?
-   → `shared/errors/` or `shared/logging/` only. MUST NOT: `shared/money.py`, `shared/slug.py`.
+   → `core/errors/` or `core/logging/` only. MUST NOT: `core/money.py`, `core/slug.py`.
 3. Every request as transport (session, current user, error JSON, request id)?
    → `http/`.
 4. A product rule (rounding, slug, cancel)?
@@ -51,7 +51,7 @@ Package, `OrderService`, `orders` table: unversioned. Only the path and `schemas
 Owner: whose tests break if this rule is deleted? That package owns the file.
 
 MUST NOT: `utils/`, `helpers/`, `common/`, `modules/common/`, `modules/shared/`, `modules/core/`.
-MUST NOT: move a helper into `shared/` because a second caller appeared — add a service method, and a DTO if needed.
+MUST NOT: move a helper into `core/` because a second caller appeared — add a service method, and a DTO if needed.
 
 ADAPTED (GİRVAK, vidinsight-blog-service): one exception to #4, and only under
 all three conditions — an **input-validation rule with no product noun**, needed
@@ -59,14 +59,14 @@ by **two or more modules' `schemas.py`**, where the service-call answer is
 structurally impossible. A Pydantic field validator has no session and cannot
 call another module's service, and *Kinds* forbids `schemas.py` importing
 another module at all, so #4 has no reachable form. Such a rule stays in
-`shared/` as a named policy file.
+`core/` as a named policy file.
 
-The one instance is `shared/url_policy.py` — an http(s) scheme allowlist for any
+The one instance is `core/url_policy.py` — an http(s) scheme allowlist for any
 stored URL that will land in an `href`/`src`, used by `posts` and `authors`
 schemas. It names no product noun, and copying it into both modules is what
 #4 forbids anyway.
 
-MUST NOT: read this as re-opening `shared/`. Everything with a product noun
+MUST NOT: read this as re-opening `core/`. Everything with a product noun
 still leaves: `slugify`, `tag_policy`, `markdown_policy`, `search_pattern` and
 `author_social` all moved to their owners, and `tag_policy` moved **behind
 `TagService`** because `posts` needed it at service time, where a service call
@@ -181,7 +181,7 @@ MUST NOT: SQL in `service.py` as a third kind.
 
 `router.py` → this `schemas`, this `service`; `http/deps`. MUST NOT: repos, helpers. Map DTO → schema only if the service already returned a DTO.
 
-`service.py` → this helpers / errors / dto; other modules' `service` (+ `dto` if it exists); `infra/db/repositories` (write **and** read repositories, 06); `infra/cache|queue|storage` clients; `shared/errors` parents; `config/` values it was given.
+`service.py` → this helpers / errors / dto; other modules' `service` (+ `dto` if it exists); `infra/db/repositories` (write **and** read repositories, 06); `infra/cache|queue|storage` clients; `core/errors` parents; `config/` values it was given.
 
 `schemas.py` → Pydantic. MUST NOT: repos, helpers, other modules.
 
@@ -215,5 +215,5 @@ Workers skip router and schema: `workers/jobs/` → `<Noun>Service` ([11-workers
 - [ ] Day one is `__init__.py` + router / schemas / service unless a trigger fired
 - [ ] One `*Service` in `service.py`; helpers named after the work; no session on helpers
 - [ ] Model/write-repo/read-repo in `infra/db`; schema is HTTP; DTO only because a second package imports it (read-repo DTO stays next to that repo, 06)
-- [ ] Two-module code has an owner (or infra/shared/http from Decide) — no `utils/` / `modules/common/`
+- [ ] Two-module code has an owner (or infra/core/http from Decide) — no `utils/` / `modules/common/`
 - [ ] Other packages import service only (dto if needed)

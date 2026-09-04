@@ -3,7 +3,7 @@
 WHEN: adding an exception class, raising from a service, mapping to HTTP, or changing the error JSON.
 LOAD: this file only.
 RELATED: 12 (what the client sees) · 09 (module `errors.py` trigger) · 10 (handler registration) · 02 (placement) — open only if the task is also that topic.
-SCOPE: `shared/errors/`, `http/errors/`, and feature exceptions inside `modules/`.
+SCOPE: `core/errors/`, `http/errors/`, and feature exceptions inside `modules/`.
 
 One hierarchy. One JSON shape. Three homes. The raise site never builds HTTP.
 
@@ -12,7 +12,7 @@ One hierarchy. One JSON shape. Three homes. The raise site never builds HTTP.
 ## Three homes
 
 ```
-shared/errors/     kernel types. no product noun.
+core/errors/       kernel types. no product noun.
 modules/<name>/    feature types that subclass the kernel. raise here.
 http/errors/       exception → status + JSON. the only HTTP map.
 ```
@@ -27,12 +27,12 @@ Workers use the same types. They do not map to HTTP. The runner logs with `Logge
 
 ## Folder vs file
 
-`shared/` and `http/` already have an `errors/` **folder** in the tree (02). That folder is the package. Inside it, start with **files**. Do not nest another folder until 01's split triggers fire — two reasons to change, or the public surface buried under helpers. Not because the file got long.
+`core/` and `http/` already have an `errors/` **folder** in the tree (02). That folder is the package. Inside it, start with **files**. Do not nest another folder until 01's split triggers fire — two reasons to change, or the public surface buried under helpers. Not because the file got long.
 
-`shared/errors/`
+`core/errors/`
 - Holds: `AppBaseError` and the status-class parents (`NotFoundError`, `AuthenticationError`, `AuthorizationError`, `ValidationError`, `ConflictError`, `RateLimitError`, `ServiceUnavailableError`).
 - One file is enough for that list. Split a file only when 01 says so.
-- MUST NOT: `OrderNotFoundError` here. MUST NOT: `orders.py` inside `shared/errors/`.
+- MUST NOT: `OrderNotFoundError` here. MUST NOT: `orders.py` inside `core/errors/`.
 - MUST NOT: the HTTP handler here. Mapping is transport → `http/errors/`.
 
 `http/errors/`
@@ -47,7 +47,7 @@ Workers use the same types. They do not map to HTTP. The runner logs with `Logge
 
 ---
 
-## Kernel types (`shared/errors/`)
+## Kernel types (`core/errors/`)
 
 Each parent is a **status class**. It sets `http_status_code` and a generic `error_code`. Feature types override `error_code` and the user `message`.
 
@@ -67,7 +67,7 @@ MUST: add a new **parent** only when a new HTTP status is needed for many featur
 MUST: import ours plainly and alias the framework's at the import site.
 
 ```python
-from shared.errors import ValidationError                  # ours: business rule, 422
+from core.errors import ValidationError                  # ours: business rule, 422
 from pydantic import ValidationError as PydanticValidationError
 from fastapi.exceptions import RequestValidationError      # what the handler registers on
 ```
@@ -140,9 +140,9 @@ MUST NOT: a service `return None` for not-found when the caller must handle abse
 ## Done
 
 - [ ] New type subclasses a kernel parent, not `Exception`
-- [ ] Feature type lives in the module, not in `shared/errors/`
-- [ ] Handler lives in `http/errors/`, not in `shared/`
-- [ ] `shared/errors/` and `http/errors/` stayed folders of files, no extra nesting
+- [ ] Feature type lives in the module, not in `core/errors/`
+- [ ] Handler lives in `http/errors/`, not in `core/`
+- [ ] `core/errors/` and `http/errors/` stayed folders of files, no extra nesting
 - [ ] Body is still `{error_code, message, details}`
 - [ ] 4xx not logged as ERROR with stack
 - [ ] Secrets / SQL / stack not in `details` or in the client `message`

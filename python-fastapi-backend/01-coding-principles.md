@@ -60,7 +60,7 @@ MUST: frozen. MUST NOT: mutate one in place — return a new one.
 MUST NOT: return a tuple of unrelated values (`return order, total, warnings`). The caller unpacks by position and a reordering breaks it silently. Return a DTO.
 MUST NOT: name a DTO `Data`, `Params`, `Info`, or `Context`. Name the thing it is — `CancellationRequest`, `OrderTotals`.
 
-WHERE it lives: the module that owns the meaning; a read-repository's DTO stays next to that repository (06, 09). MUST NOT: a `shared/dto.py` collection.
+WHERE it lives: the module that owns the meaning; a read-repository's DTO stays next to that repository (06, 09). MUST NOT: a `core/dto.py` collection.
 
 ---
 
@@ -119,7 +119,7 @@ Calls: infra/db/repositories/order.py, billing/service.py
 ```
 
 `Module` — file identity (`orders/service.py`).
-`Layer` — one word: `Router` · `Schema` · `Service` · `Repository` · `Model` · `Worker` · `Shared` · `Test`.
+`Layer` — one word: `Router` · `Schema` · `Service` · `Repository` · `Model` · `Worker` · `Core` · `Test`.
 `Purpose` — allowed work. Second sentence = what this file must not do, if a later agent would guess wrong.
 `Dependencies` — injected types.
 `Called by` / `Calls` — concrete files.

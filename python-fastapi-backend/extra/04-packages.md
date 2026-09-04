@@ -21,7 +21,7 @@ Stop at the first yes.
 4. Used in one module, 40 lines, no second caller?
    → helper file in that module (09). MUST NOT: a package "for cleanliness."
 
-MUST NOT: `src/shared/ml.py`, `src/utils/execution`. MUST NOT: put the library inside `modules/` so HTTP schemas leak into it.
+MUST NOT: `src/core/ml.py`, `src/utils/execution`. MUST NOT: put the library inside `modules/` so HTTP schemas leak into it.
 
 ---
 
@@ -92,6 +92,6 @@ MUST NOT: log secrets (04). MUST NOT: be the source of truth for product rows (0
 ## Done
 
 - [ ] Decide first-yes: infra vendor vs module vs `packages/<name>` vs helper
-- [ ] Package sits at `packages/<name>/` (or its own repo), not under `shared/` / `utils/`
+- [ ] Package sits at `packages/<name>/` (or its own repo), not under `core/` / `utils/`
 - [ ] Backend service/worker calls it; package does not import modules or repos
 - [ ] Long work is a job + 202; artifacts in storage; meaning in the module

@@ -26,7 +26,7 @@ Name: `test_<src_file>.py` next to the same folders. MUST NOT: `test_orders.py` 
 
 `tests/factories/` — open only when **three** test packages build the same graph. Named after the noun (`order.py`, `user.py`). MUST NOT: `helpers.py`. Until then: a builder function in the module's test package.
 
-Tests for `shared/` / `config/` only when that package has behavior. Do not create empty mirror folders.
+Tests for `core/` / `config/` only when that package has behavior. Do not create empty mirror folders.
 
 ---
 

@@ -161,7 +161,7 @@ workers/runner.py
             → commit
 ```
 
-`workers/` → may import: module `service` + `dto`, `infra/queue` (consume), `infra/db/session.py` (scope), `config/`, `shared/logging`, `shared/errors` (classify).
+`workers/` → may import: module `service` + `dto`, `infra/queue` (consume), `infra/db/session.py` (scope), `config/`, `core/logging`, `core/errors` (classify).
 
 `workers/` → MUST NOT import: `http/`, `infra/db/repositories`, `infra/db/models`, `infra/email` (or other vendor clients), module `router` / `schemas` / helpers.
 

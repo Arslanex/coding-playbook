@@ -106,7 +106,7 @@ Same chain as a single agent. No extra backbone folder.
 - `infra/` LLM or sandbox — vendor verbs (08, [Extra 04](04-packages.md))
 - `workers/jobs` — one kind per file; call `AgentService` / noun service
 
-MUST NOT: a `TeamRuntime` in `http/`. MUST NOT: the LLM client in `shared/`.
+MUST NOT: a `TeamRuntime` in `http/`. MUST NOT: the LLM client in `core/`.
 
 ---
 

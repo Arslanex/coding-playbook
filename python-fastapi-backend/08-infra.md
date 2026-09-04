@@ -20,7 +20,7 @@ Stop at the first yes.
 3. The file is "cache this order 60s", "send mail when cancelled", "user may upload an invoice"?
    → **not infra** — `modules/<capability>/` ([09-modules.md](09-modules.md)). That module **calls** infra.
 
-MUST NOT: HTTP routes, feature exceptions' JSON map, logger pipeline (`shared/logging/`), or `commit()` here.
+MUST NOT: HTTP routes, feature exceptions' JSON map, logger pipeline (`core/logging/`), or `commit()` here.
 MUST NOT: a second `utils/` under infra.
 
 ---

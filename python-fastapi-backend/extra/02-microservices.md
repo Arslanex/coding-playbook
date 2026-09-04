@@ -28,7 +28,7 @@ The repo root is no longer a single `backend/src`. Each service is a **full** ba
 │   │   ├── src/
 │   │   │   ├── main.py
 │   │   │   ├── config/
-│   │   │   ├── shared/         # errors + logging only (02) — copy or workspace pkg
+│   │   │   ├── core/           # errors + logging only (02) — copy or workspace pkg
 │   │   │   ├── http/
 │   │   │   ├── infra/          # this service's db/cache/queue client
 │   │   │   ├── modules/        # only this service's capabilities
@@ -49,7 +49,7 @@ What **changes** vs one backend:
 - Each service that owns tables has **its own** `infra/db` and **its own** `migrations/` beside that service's `src/` (02, 07). MUST NOT: one `migrations/` for all services. MUST NOT: a shared chain at the repo root that several services replay.
 - `modules/` inside a service holds only that service's nouns. Billing does not contain `modules/orders/`.
 - Cross-service types: event/HTTP DTOs in `packages/events/` (or duplicated frozen schemas until the second consumer). MUST NOT: `packages/models/` of SQLAlchemy.
-- `shared/errors` parents: one small package **or** a copy. Feature errors stay in that service's module (05).
+- `core/errors` parents: one small package **or** a copy. Feature errors stay in that service's module (05).
 
 MUST NOT: `services/orders/src/api` + `services/orders/src/domain` as a return to three cities.
 MUST NOT: a `services/libs/utils`.

@@ -38,7 +38,7 @@ GET  /v1/auth/sso/{provider}/start      → 302 to IdP
 GET  /v1/auth/sso/{provider}/callback   → our tokens (or 302 to the app with a one-time code)
 ```
 
-MUST NOT: put the IdP SDK in `http/` or in `shared/`. MUST NOT: `Authlib` as a folder name.
+MUST NOT: put the IdP SDK in `http/` or in `core/`. MUST NOT: `Authlib` as a folder name.
 
 `config/`: client id, redirect URI, issuer URL. Secrets in the secret store. MUST NOT: client secret in the frontend.
 

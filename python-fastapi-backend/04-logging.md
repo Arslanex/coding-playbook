@@ -2,7 +2,7 @@
 
 WHEN: adding a log line, a logger name, a filter, a formatter, a handler, or startup logging.
 LOAD: this file only.
-RELATED: 02 (the package lives in `shared/logging/`) · 12 (`request_id` as the client-facing trace id) · 03 (log level, rotation settings) — open only if the task is also that topic.
+RELATED: 02 (the package lives in `core/logging/`) · 12 (`request_id` as the client-facing trace id) · 03 (log level, rotation settings) — open only if the task is also that topic.
 SCOPE: every process that emits logs (API and workers).
 
 The pipeline is one. Named loggers are labels, not separate stacks.
@@ -39,7 +39,7 @@ Named loggers share this pipeline. They differ only in `record.name`. MUST NOT: 
 
 ## Where the package lives
 
-`shared/logging/` — kernel. No product noun.
+`core/logging/` — kernel. No product noun.
 
 Holds: setup, logger names, context bind/reset, filters, JSON formatter, queue listener, stdout handler, optional rotating handler.
 
@@ -52,7 +52,7 @@ Does not hold: "order cancelled" messages. Those stay at the call site in `modul
 Pick by where the call site lives, not by the event.
 
 - `api` — `http/` (middleware, deps, error map)
-- `system` — `modules/`, `infra/`, `config/`, `shared/`
+- `system` — `modules/`, `infra/`, `config/`, `core/`
 - `worker` — `workers/`
 - `error` — `http/errors/` unhandled 5xx **only**. MUST NOT: workers or module services use this name.
 - `audit` — a state change that must be reconstructible (create/cancel/permission/money). Same pipeline. Downstream filters `"logger": "audit"`
@@ -137,7 +137,7 @@ Distributed tracing is **additive**, and only when spans across processes are a 
 - MUST: OpenTelemetry auto-instrumentation, not a hand-rolled span tree.
 - MUST: add `trace_id` / `span_id` to the **context filter** so a log line joins a span. One pipeline, one filter — MUST NOT: a second logging stack for traces.
 - MUST NOT: replace `request_id` with `trace_id`. The client echoes `X-Request-ID` (12); a sampled-away trace must not lose the correlation.
-- MUST NOT: a tracing SDK in `shared/logging/`. Wiring is `main.py` / `runner.py`; the exporter endpoint is `config/` (03).
+- MUST NOT: a tracing SDK in `core/logging/`. Wiring is `main.py` / `runner.py`; the exporter endpoint is `config/` (03).
 
 Until an exporter is actually deployed: zero files.
 
@@ -159,7 +159,7 @@ Root logger: level WARNING, same queue/stdout path, so libraries do not print fo
 
 ## Done
 
-- [ ] No new handler/filter/formatter outside `shared/logging/`
+- [ ] No new handler/filter/formatter outside `core/logging/`
 - [ ] Call site uses `get_logger(LoggerName.…)` only
 - [ ] `request_id` / `user_id` come from context, not copied into every `extra=`
 - [ ] Secrets would be redacted if they appeared in `extra=`
